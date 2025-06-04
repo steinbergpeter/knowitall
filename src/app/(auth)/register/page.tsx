@@ -1,3 +1,4 @@
+import React from 'react'
 import { AuthShell } from '@/components/auth-shell'
 import { RegisterForm } from '@/components/register-form'
 
