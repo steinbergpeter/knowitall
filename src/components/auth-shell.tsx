@@ -1,12 +1,11 @@
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { DialogTitle } from '@/components/ui/dialog'
-import React from 'react'
+import type { ReactNode } from 'react'
 
 interface AuthShellProps {
   title: string
-  children: React.ReactNode
+  children: ReactNode
   oauthLabel: string
   oauthAction: string
   switchText: string
@@ -23,15 +22,16 @@ export function AuthShell({
 }: AuthShellProps) {
   return (
     <Card className={`max-w-md w-full p-8 space-y-6`}>
-      <DialogTitle className="text-2xl font-bold text-center">
-        {title}
-      </DialogTitle>
+      <h1 className="text-2xl font-bold text-center">{title}</h1>
+
       {children}
+
       <div className="flex items-center gap-2 my-4">
         <div className="flex-1 h-px bg-muted-foreground/20" />
         <span className="text-xs text-muted-foreground">or</span>
         <div className="flex-1 h-px bg-muted-foreground/20" />
       </div>
+
       <form method="post" action={oauthAction} className="w-full">
         <Button
           type="submit"
@@ -42,6 +42,7 @@ export function AuthShell({
           {oauthLabel}
         </Button>
       </form>
+
       <div className="text-center text-sm text-muted-foreground">
         {switchText}{' '}
         <Link href={switchHref} className="underline">

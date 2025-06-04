@@ -1,9 +1,9 @@
-import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
 import { Header } from '@/components/header'
 import ProjectInList from '@/components/project-in-list'
+import { authOptions } from '@/lib/auth'
+import prisma from '@/lib/prisma'
 import { Project } from '@prisma/client'
+import { getServerSession } from 'next-auth'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)

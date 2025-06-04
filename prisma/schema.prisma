@@ -44,19 +44,20 @@ model VerificationToken {
 
 // INTERNAL MODELS
 model User {
-  id             String    @id @default(cuid())
-  authProviderId String    @unique // e.g., NextAuth.js user.id or OAuth sub
-  email          String    @unique
+  id             String     @id @default(cuid())
+  authProviderId String     @unique // e.g., NextAuth.js user.id or OAuth sub
+  email          String     @unique
   name           String?
   image          String?
-  role           String    @default("USER") // e.g., "USER", "ADMIN"
+  role           String     @default("USER") // e.g., "USER", "ADMIN"
   bio            String?
   passwordHash   String? // Hashed password for credentials (email/password) users
   projects       Project[]
   accounts       Account[]
   sessions       Session[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  documents      Document[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 model Project {
@@ -64,13 +65,14 @@ model Project {
   name         String
   description  String?
   isPublic     Boolean              @default(false)
-  passwordHash String // Hashed password for private projects
+  passwordHash String? // Hashed password for private projects
   owner        User                 @relation(fields: [ownerId], references: [id])
   ownerId      String
   queries      ResearchQuery[]
   nodes        KnowledgeGraphNode[]
   edges        KnowledgeGraphEdge[]
   summaries    SummaryPoint[]
+  documents    Document[]
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 }
@@ -82,36 +84,64 @@ model ResearchQuery {
   queryText String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  nodes     KnowledgeGraphNode[]
+  edges     KnowledgeGraphEdge[]
+  summaries SummaryPoint[]
 }
 
 model KnowledgeGraphNode {
-  id        String   @id @default(cuid())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  label     String
-  type      String
-  metadata  Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String         @id @default(cuid())
+  project         Project        @relation(fields: [projectId], references: [id])
+  projectId       String
+  label           String
+  type            String
+  metadata        Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  researchQuery   ResearchQuery? @relation(fields: [researchQueryId], references: [id])
+  researchQueryId String?
+  provenance      String? // e.g., source document, extraction method, etc.
 }
 
 model KnowledgeGraphEdge {
-  id        String   @id @default(cuid())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  source    String // Node id
-  target    String // Node id
-  type      String
-  metadata  Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String         @id @default(cuid())
+  project         Project        @relation(fields: [projectId], references: [id])
+  projectId       String
+  source          String // Node id
+  target          String // Node id
+  type            String
+  metadata        Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  researchQuery   ResearchQuery? @relation(fields: [researchQueryId], references: [id])
+  researchQueryId String?
+  provenance      String? // e.g., source document, extraction method, etc.
 }
 
 model SummaryPoint {
+  id              String         @id @default(cuid())
+  project         Project        @relation(fields: [projectId], references: [id])
+  projectId       String
+  text            String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  researchQuery   ResearchQuery? @relation(fields: [researchQueryId], references: [id])
+  researchQueryId String?
+  provenance      String? // e.g., source document, extraction method, etc.
+}
+
+model Document {
   id        String   @id @default(cuid())
   project   Project  @relation(fields: [projectId], references: [id])
   projectId String
-  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+  type      String // e.g., 'pdf', 'web', 'text', etc.
+  url       String? // For web/PDF sources
+  content   String? // Raw text content
+  metadata  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

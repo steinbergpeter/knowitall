@@ -1,4 +1,3 @@
-import React from 'react'
 import { AuthShell } from '@/components/auth-shell'
 import { SignInForm } from '@/components/signin-form'
 
