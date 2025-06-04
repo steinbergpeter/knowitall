@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import { geistSans, geistMono } from '@/styles/fonts'
+import Providers from '@/providers'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -9,15 +10,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modals,
 }: Readonly<{
   children: React.ReactNode
+  modals: React.ReactNode
 }>) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
+        {modals}
       </body>
     </html>
   )

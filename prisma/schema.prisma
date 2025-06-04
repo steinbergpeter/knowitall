@@ -51,6 +51,7 @@ model User {
   image          String?
   role           String    @default("USER") // e.g., "USER", "ADMIN"
   bio            String?
+  passwordHash   String? // Hashed password for credentials (email/password) users
   projects       Project[]
   accounts       Account[]
   sessions       Session[]
