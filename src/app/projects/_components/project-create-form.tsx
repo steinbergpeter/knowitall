@@ -14,13 +14,12 @@ export function ProjectCreateForm({
   const [values, setValues] = useState({
     name: '',
     description: '',
-    isPublic: false,
     password: '',
   })
 
   const mutation = useCreateProject((project) => {
     onCreated?.(project)
-    setValues({ name: '', description: '', isPublic: false, password: '' })
+    setValues({ name: '', description: '', password: '' })
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +28,7 @@ export function ProjectCreateForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate(values)
+    mutation.mutate(values) // Do not send isPublic
   }
 
   if (status === 'loading') return <div>Loading...</div>
@@ -62,19 +61,6 @@ export function ProjectCreateForm({
         onChange={handleChange}
         type="password"
       />
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            name="isPublic"
-            checked={!!values.isPublic}
-            onChange={(e) =>
-              setValues((v) => ({ ...v, isPublic: e.target.checked }))
-            }
-          />{' '}
-          Public
-        </label>
-      </div>
       {mutation.error && (
         <div className="text-red-500 text-sm">{mutation.error.message}</div>
       )}

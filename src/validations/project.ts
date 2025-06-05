@@ -3,7 +3,6 @@ import { z } from 'zod'
 export const ProjectSchema = z.object({
   name: z.string().trim().min(2, 'Project name is required').max(100),
   description: z.string().trim().max(500).optional(),
-  isPublic: z.boolean().optional(),
   password: z.string().trim().max(100).optional(),
 })
 
@@ -21,3 +20,19 @@ export const CreatedProjectSchema = z.object({
 })
 
 export type CreatedProject = z.infer<typeof CreatedProjectSchema>
+
+export const ProjectDetailSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  isPublic: z.boolean(),
+  owner: z.object({
+    id: z.string(),
+    name: z.string().nullable().optional(),
+    email: z.string().nullable().optional(),
+  }),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+})
+
+export type ProjectDetail = z.infer<typeof ProjectDetailSchema>

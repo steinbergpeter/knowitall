@@ -18,11 +18,12 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     )
   }
-  const { name, description, isPublic, password } = parsed.data
+  const { name, description, password } = parsed.data
   let passwordHash: string | undefined = undefined
   if (password) {
     passwordHash = await hashPassword(password)
   }
+  const isPublic = !password
   const data: {
     name: string
     description?: string
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
   } = {
     name,
     description,
-    isPublic: !!isPublic,
+    isPublic,
     owner: { connect: { id: session.user.id } },
   }
   if (passwordHash) {

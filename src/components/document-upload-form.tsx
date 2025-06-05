@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateDocument } from '@/server-state/mutations/useCreateDocument'
-import { DocumentSchema } from '@/validations/document'
+import { DocumentSchema, type DocumentType } from '@/validations/document'
 
 export function DocumentUploadForm({
   projectId,
@@ -12,7 +12,6 @@ export function DocumentUploadForm({
   projectId: string
   onUploaded?: () => void
 }) {
-  type DocumentType = 'text' | 'pdf' | 'web'
   const [type, setType] = useState<DocumentType>('text')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -38,7 +37,6 @@ export function DocumentUploadForm({
       const arrayBuffer = await file.arrayBuffer()
       pdfContent = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
     }
-    // DRY: Build input object once
     const input = {
       projectId,
       title,
@@ -47,7 +45,6 @@ export function DocumentUploadForm({
         type === 'text' ? content : type === 'pdf' ? pdfContent : undefined,
       url: type === 'web' ? url : undefined,
     }
-    // Validate with Zod
     const { success, data, error } = DocumentSchema.safeParse(input)
     if (!success) {
       setValidationError(error.errors[0]?.message || 'Invalid input')

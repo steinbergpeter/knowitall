@@ -24,3 +24,5 @@ export const CreatedDocumentSchema = z.object({
   updatedAt: z.string(), // ISO date string
 })
 export type CreatedDocument = z.infer<typeof CreatedDocumentSchema>
+
+export type DocumentType = 'text' | 'pdf' | 'web'
