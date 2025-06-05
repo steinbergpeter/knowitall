@@ -20,8 +20,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
-        {modals}
+        <Providers>
+          {children}
+          {modals}
+        </Providers>
       </body>
     </html>
   )
