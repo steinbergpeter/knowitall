@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button'
 
 export function RegisterForm() {
   return (
-    <form className="space-y-4">
+    <form
+      className="space-y-4"
+      method="post"
+      action="/api/auth/callback/credentials"
+    >
       <Input name="name" type="text" placeholder="Name" required />
       <Input name="email" type="email" placeholder="Email" required />
       <Input

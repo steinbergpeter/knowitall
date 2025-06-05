@@ -71,44 +71,14 @@ export function Header({
         ) : (
           <>
             <Button asChild size="sm">
-              <Link
-                href="/signin"
-                scroll={false}
-                replace={false}
-                shallow={true}
-                prefetch={false}
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.history.pushState({}, '', '/signin')
-                  document.body.dispatchEvent(
-                    new CustomEvent('open-modal', { detail: 'signin' })
-                  )
-                }}
-              >
-                Sign in
-              </Link>
+              <Link href="/signin">Sign in</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link
-                href="/register"
-                scroll={false}
-                replace={false}
-                shallow={true}
-                prefetch={false}
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.history.pushState({}, '', '/register')
-                  document.body.dispatchEvent(
-                    new CustomEvent('open-modal', { detail: 'register' })
-                  )
-                }}
-              >
-                Sign up
-              </Link>
+              <Link href="/register">Sign up</Link>
             </Button>
-            <span className="text-xs text-muted-foreground">
+            {/* <span className="text-xs text-muted-foreground">
               or continue as guest
-            </span>
+            </span> */}
           </>
         )}
       </nav>
