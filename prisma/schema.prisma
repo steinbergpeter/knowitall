@@ -44,20 +44,20 @@ model VerificationToken {
 
 // INTERNAL MODELS
 model User {
-  id             String     @id @default(cuid())
-  authProviderId String     @unique // e.g., NextAuth.js user.id or OAuth sub
-  email          String     @unique
-  name           String?
-  image          String?
-  role           String     @default("USER") // e.g., "USER", "ADMIN"
-  bio            String?
-  passwordHash   String? // Hashed password for credentials (email/password) users
-  projects       Project[]
-  accounts       Account[]
-  sessions       Session[]
-  documents      Document[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  id            String     @id @default(cuid())
+  email         String?    @unique
+  emailVerified DateTime? // <-- Required by NextAuth Prisma Adapter
+  name          String?
+  image         String?
+  passwordHash  String?
+  role          String     @default("USER") // e.g., "USER", "ADMIN"
+  bio           String?
+  projects      Project[]
+  accounts      Account[]
+  sessions      Session[]
+  documents     Document[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Project {

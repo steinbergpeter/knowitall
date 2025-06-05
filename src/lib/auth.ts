@@ -33,23 +33,9 @@ export const authOptions: NextAuthOptions = {
     strategy: 'database',
   },
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user }) {
       if (!user?.email) return false
-      const authProviderId = account?.providerAccountId || user.id
-      await prisma.user.upsert({
-        where: { authProviderId },
-        update: {
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        },
-        create: {
-          authProviderId,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        },
-      })
+      // Remove upsert logic, let PrismaAdapter handle user creation
       return true
     },
     async session({ session }) {

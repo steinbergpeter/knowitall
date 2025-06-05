@@ -1,51 +1,24 @@
-import { Header } from '@/components/header'
-import ProjectInList from '@/components/project-in-list'
-import { authOptions } from '@/lib/auth'
-import prisma from '@/lib/prisma'
-import { Project } from '@prisma/client'
-import { getServerSession } from 'next-auth'
+import Image from 'next/image'
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions)
-  let projects: Array<Project> = []
-
-  if (session?.user) {
-    projects = await prisma.project.findMany({
-      where: {
-        OR: [{ isPublic: true }, { ownerId: session.user.id }],
-      },
-      orderBy: { createdAt: 'desc' },
-    })
-  } else {
-    projects = await prisma.project.findMany({
-      where: { isPublic: true },
-      orderBy: { createdAt: 'desc' },
-    })
-  }
-
-  const user = session?.user
-    ? {
-        name: session.user.name ?? undefined,
-        email: session.user.email ?? undefined,
-        image: session.user.image ?? undefined,
-      }
-    : undefined
-
+export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header user={user} />
-      <main className="max-w-2xl mx-auto py-10 px-4 w-full flex-1">
-        <h1 className="text-3xl font-bold mb-6">KnowItAll Projects</h1>
-        <ul className="space-y-2">
-          {projects.map((project) => (
-            <ProjectInList
-              key={project.id}
-              project={project}
-              userId={session?.user?.id}
-            />
-          ))}
-        </ul>
-      </main>
-    </div>
+    <main className="flex flex-col items-center justify-center min-h-screen py-12">
+      <Image
+        src="/globe.svg"
+        alt="Knowledge Globe"
+        width={120}
+        height={120}
+        className="mb-6"
+      />
+      <h1 className="text-4xl font-bold mb-4 text-center">
+        Welcome to KnowItAll
+      </h1>
+      <p className="text-lg text-muted-foreground text-center max-w-xl mb-8">
+        Create a project, upload your documents, and let AI build a knowledge
+        graph for you. Get answers, explore connections, and unlock insights
+        from your data.
+      </p>
+      {/* You can add a call-to-action button here, e.g. to go to /projects */}
+    </main>
   )
 }

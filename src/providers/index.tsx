@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import ThemeProvider from './theme-provider'
 import TanstackQueryProvider from './tanstack-query-provider'
+import { SessionProvider } from 'next-auth/react'
 
 type ProviderProps = {
   children: ReactNode
@@ -10,7 +11,9 @@ type ProviderProps = {
 function Providers({ children }: ProviderProps) {
   return (
     <ThemeProvider>
-      <TanstackQueryProvider>{children}</TanstackQueryProvider>
+      <SessionProvider>
+        <TanstackQueryProvider>{children}</TanstackQueryProvider>
+      </SessionProvider>
     </ThemeProvider>
   )
 }

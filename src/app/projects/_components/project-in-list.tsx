@@ -1,7 +1,5 @@
-'use client'
-
-import React from 'react'
 import { type CreatedProject } from '@/validations/project'
+import Link from 'next/link'
 
 type ProjectInListProps = {
   project: CreatedProject
@@ -19,12 +17,12 @@ const ProjectInList = ({ project, userId }: ProjectInListProps) => {
       </span>
       {userId && project.ownerId === userId && (
         <div className="mt-2">
-          <a
+          <Link
             href={`/projects/${project.id}/edit`}
             className="text-blue-600 underline text-sm"
           >
             Edit
-          </a>
+          </Link>
         </div>
       )}
     </li>
