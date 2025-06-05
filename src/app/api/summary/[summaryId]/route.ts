@@ -16,7 +16,7 @@ export async function GET(
   if (!summaryId) {
     return NextResponse.json({ error: 'Missing summaryId' }, { status: 400 })
   }
-  const summary = await prisma.summaryPoint.findUnique({
+  const summary = await prisma.summary.findUnique({
     where: { id: summaryId },
   })
   if (!summary) {
@@ -45,7 +45,7 @@ export async function PATCH(
       { status: 400 }
     )
   }
-  const summary = await prisma.summaryPoint.update({
+  const summary = await prisma.summary.update({
     where: { id: summaryId },
     data: parsed.data,
   })
@@ -64,6 +64,6 @@ export async function DELETE(
   if (!summaryId) {
     return NextResponse.json({ error: 'Missing summaryId' }, { status: 400 })
   }
-  await prisma.summaryPoint.delete({ where: { id: summaryId } })
+  await prisma.summary.delete({ where: { id: summaryId } })
   return NextResponse.json({ success: true })
 }

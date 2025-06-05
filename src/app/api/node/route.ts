@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     metadata: parsed.data.metadata,
     ...(researchQueryId ? { researchQueryId } : {}),
   }
-  const node = await prisma.knowledgeGraphNode.create({
+  const node = await prisma.node.create({
     data,
   })
   return NextResponse.json({ node })
@@ -51,6 +51,6 @@ export async function GET(req: NextRequest) {
   const where: { projectId?: string; researchQueryId?: string } = {}
   if (projectId) where.projectId = projectId
   if (researchQueryId) where.researchQueryId = researchQueryId
-  const nodes = await prisma.knowledgeGraphNode.findMany({ where })
+  const nodes = await prisma.node.findMany({ where })
   return NextResponse.json({ nodes })
 }

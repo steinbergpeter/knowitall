@@ -26,10 +26,10 @@ export async function POST(req: NextRequest) {
     provenance: parsed.data.provenance,
     ...(researchQueryId ? { researchQueryId } : {}),
   }
-  const summaryPoint = await prisma.summaryPoint.create({
+  const summary = await prisma.summary.create({
     data,
   })
-  return NextResponse.json({ summaryPoint })
+  return NextResponse.json({ summary })
 }
 
 // List all summary points for a project or research query
@@ -50,6 +50,6 @@ export async function GET(req: NextRequest) {
   const where: { projectId?: string; researchQueryId?: string } = {}
   if (projectId) where.projectId = projectId
   if (researchQueryId) where.researchQueryId = researchQueryId
-  const summaryPoints = await prisma.summaryPoint.findMany({ where })
-  return NextResponse.json({ summaryPoints })
+  const summarys = await prisma.summary.findMany({ where })
+  return NextResponse.json({ summarys })
 }

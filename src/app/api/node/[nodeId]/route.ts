@@ -16,7 +16,7 @@ export async function GET(
   if (!nodeId) {
     return NextResponse.json({ error: 'Missing nodeId' }, { status: 400 })
   }
-  const node = await prisma.knowledgeGraphNode.findUnique({
+  const node = await prisma.node.findUnique({
     where: { id: nodeId },
   })
   if (!node) {
@@ -45,7 +45,7 @@ export async function PATCH(
       { status: 400 }
     )
   }
-  const node = await prisma.knowledgeGraphNode.update({
+  const node = await prisma.node.update({
     where: { id: nodeId },
     data: parsed.data,
   })
@@ -64,6 +64,6 @@ export async function DELETE(
   if (!nodeId) {
     return NextResponse.json({ error: 'Missing nodeId' }, { status: 400 })
   }
-  await prisma.knowledgeGraphNode.delete({ where: { id: nodeId } })
+  await prisma.node.delete({ where: { id: nodeId } })
   return NextResponse.json({ success: true })
 }

@@ -16,7 +16,7 @@ export async function GET(
   if (!queryId) {
     return NextResponse.json({ error: 'Missing queryId' }, { status: 400 })
   }
-  const query = await prisma.researchQuery.findUnique({
+  const query = await prisma.query.findUnique({
     where: { id: queryId },
   })
   if (!query) {
@@ -47,7 +47,7 @@ export async function PATCH(
   }
   // Prisma expects queryText, not query
   const data = parsed.data.query ? { queryText: parsed.data.query } : {}
-  const query = await prisma.researchQuery.update({
+  const query = await prisma.query.update({
     where: { id: queryId },
     data,
   })
@@ -66,6 +66,6 @@ export async function DELETE(
   if (!queryId) {
     return NextResponse.json({ error: 'Missing queryId' }, { status: 400 })
   }
-  await prisma.researchQuery.delete({ where: { id: queryId } })
+  await prisma.query.delete({ where: { id: queryId } })
   return NextResponse.json({ success: true })
 }

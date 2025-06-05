@@ -16,7 +16,7 @@ export async function GET(
   if (!edgeId) {
     return NextResponse.json({ error: 'Missing edgeId' }, { status: 400 })
   }
-  const edge = await prisma.knowledgeGraphEdge.findUnique({
+  const edge = await prisma.edge.findUnique({
     where: { id: edgeId },
   })
   if (!edge) {
@@ -45,7 +45,7 @@ export async function PATCH(
       { status: 400 }
     )
   }
-  const edge = await prisma.knowledgeGraphEdge.update({
+  const edge = await prisma.edge.update({
     where: { id: edgeId },
     data: parsed.data,
   })
@@ -64,6 +64,6 @@ export async function DELETE(
   if (!edgeId) {
     return NextResponse.json({ error: 'Missing edgeId' }, { status: 400 })
   }
-  await prisma.knowledgeGraphEdge.delete({ where: { id: edgeId } })
+  await prisma.edge.delete({ where: { id: edgeId } })
   return NextResponse.json({ success: true })
 }

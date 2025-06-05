@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     metadata: parsed.data.metadata,
     ...(researchQueryId ? { researchQueryId } : {}),
   }
-  const edge = await prisma.knowledgeGraphEdge.create({
+  const edge = await prisma.edge.create({
     data,
   })
   return NextResponse.json({ edge })
@@ -51,6 +51,6 @@ export async function GET(req: NextRequest) {
   const where: { projectId?: string; researchQueryId?: string } = {}
   if (projectId) where.projectId = projectId
   if (researchQueryId) where.researchQueryId = researchQueryId
-  const edges = await prisma.knowledgeGraphEdge.findMany({ where })
+  const edges = await prisma.edge.findMany({ where })
   return NextResponse.json({ edges })
 }

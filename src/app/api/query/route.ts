@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
     project: { connect: { id: body.projectId } },
     // Optionally add documents if you have a relation
   }
-  const researchQuery = await prisma.researchQuery.create({
+  const query = await prisma.query.create({
     data,
   })
-  return NextResponse.json({ researchQuery })
+  return NextResponse.json({ query })
 }
 
 // List all research queries for a project
@@ -41,6 +41,6 @@ export async function GET(req: NextRequest) {
   if (!projectId) {
     return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
   }
-  const queries = await prisma.researchQuery.findMany({ where: { projectId } })
+  const queries = await prisma.query.findMany({ where: { projectId } })
   return NextResponse.json({ queries })
 }
