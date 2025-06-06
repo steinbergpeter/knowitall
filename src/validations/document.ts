@@ -19,6 +19,7 @@ export const CreatedDocumentSchema = z.object({
   type: z.string(), // e.g., 'pdf', 'web', 'text'
   url: z.string().url().optional().nullable().default(null),
   content: z.string().optional().nullable().default(null),
+  extractedText: z.string().optional().nullable().default(null),
   metadata: z.record(z.any()).optional().nullable().default(null),
   createdAt: z.string(), // ISO date string
   updatedAt: z.string(), // ISO date string

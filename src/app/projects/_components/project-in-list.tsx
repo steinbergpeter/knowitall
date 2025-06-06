@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { type CreatedProject } from '@/validations/project'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { type CreatedProject } from '@/validations/project'
 import { DialogTitle } from '@radix-ui/react-dialog'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 type ProjectInListProps = {
   project: CreatedProject

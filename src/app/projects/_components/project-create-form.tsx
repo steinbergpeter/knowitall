@@ -1,25 +1,28 @@
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useSession } from 'next-auth/react'
 import { useCreateProject } from '@/server-state/mutations/useCreateProject'
 import { type CreatedProject } from '@/validations/project'
+import { useSession } from 'next-auth/react'
+import { useState } from 'react'
 
-export function ProjectCreateForm({
-  onCreated,
-}: {
+interface ProjectCreateFormProps {
   onCreated?: (project: CreatedProject) => void
-}) {
-  const { data: session, status } = useSession()
-  const [values, setValues] = useState({
-    name: '',
-    description: '',
-    password: '',
-  })
+}
 
-  const mutation = useCreateProject((project) => {
+export function ProjectCreateForm({ onCreated }: ProjectCreateFormProps) {
+  const { data: session, status } = useSession()
+
+  const initialValues = { name: '', description: '', password: '' }
+
+  const [values, setValues] = useState(initialValues)
+
+  const {
+    mutate: createProject,
+    error,
+    isPending,
+  } = useCreateProject((project) => {
     onCreated?.(project)
-    setValues({ name: '', description: '', password: '' })
+    setValues(initialValues)
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +31,7 @@ export function ProjectCreateForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    mutation.mutate(values) // Do not send isPublic
+    createProject(values) // Do not send isPublic
   }
 
   if (status === 'loading') return <div>Loading...</div>
@@ -61,11 +64,9 @@ export function ProjectCreateForm({
         onChange={handleChange}
         type="password"
       />
-      {mutation.error && (
-        <div className="text-red-500 text-sm">{mutation.error.message}</div>
-      )}
-      <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? 'Creating...' : 'Create Project'}
+      {error && <div className="text-red-500 text-sm">{error.message}</div>}
+      <Button type="submit" disabled={isPending}>
+        {isPending ? 'Creating...' : 'Create Project'}
       </Button>
     </form>
   )

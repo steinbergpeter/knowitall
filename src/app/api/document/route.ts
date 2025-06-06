@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { DocumentSchema } from '@/validations/document'
+import { extractPdfText } from '@/lib/pdf'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -10,14 +11,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = await req.json()
-  const parsed = DocumentSchema.safeParse(body)
-  if (!parsed.success) {
+  const { success, data: docData, error } = DocumentSchema.safeParse(body)
+  if (!success) {
     return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error },
+      { error: 'Invalid input', details: error },
       { status: 400 }
     )
   }
-  const { projectId, title, type, url, content, metadata } = parsed.data
+  const { projectId, title, type, url, content, metadata } = docData
+  let extractedText: string | undefined = undefined
+  if (type === 'pdf' && content) {
+    extractedText = await extractPdfText(content)
+  }
   const document = await prisma.document.create({
     data: {
       project: { connect: { id: projectId } },
@@ -26,6 +31,7 @@ export async function POST(req: NextRequest) {
       type,
       url,
       content,
+      extractedText,
       metadata,
     },
   })

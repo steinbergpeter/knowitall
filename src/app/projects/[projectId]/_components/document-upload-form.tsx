@@ -4,8 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateDocument } from '@/server-state/mutations/useCreateDocument'
-import { DocumentSchema, type DocumentType } from '@/validations/document'
+import { DocumentSchema } from '@/validations/document'
 import { useState } from 'react'
+
+function getFileType(file: File): 'pdf' | 'text' | 'web' | null {
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  if (file.type === 'application/pdf' || ext === 'pdf') return 'pdf'
+  if (
+    file.type === 'text/plain' ||
+    file.type === 'application/rtf' ||
+    ext === 'txt' ||
+    ext === 'rtf'
+  )
+    return 'text'
+  return null
+}
 
 function DocumentUploadForm({
   projectId,
@@ -14,7 +27,7 @@ function DocumentUploadForm({
   projectId: string
   onUploaded?: () => void
 }) {
-  const [type, setType] = useState<DocumentType>('text')
+  const [type, setType] = useState<'text' | 'pdf' | 'web' | null>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [url, setUrl] = useState('')
@@ -26,26 +39,74 @@ function DocumentUploadForm({
     setContent('')
     setUrl('')
     setFile(null)
+    setType(null)
     setValidationError(null)
     onUploaded?.()
   }
 
   const { mutate: createDoc, error, isPending } = useCreateDocument(onCreated)
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const detectedType = getFileType(file)
+    if (!detectedType) {
+      setValidationError(
+        'Unsupported file type. Only PDF, TXT, and RTF are allowed.'
+      )
+      setFile(null)
+      setType(null)
+      setContent('')
+      return
+    }
+    setValidationError(null)
+    setFile(file)
+    setType(detectedType)
+    setTitle((prev) => prev || file.name.replace(/\.[^.]+$/, ''))
+    if (detectedType === 'text') {
+      const text = await file.text()
+      setContent(text)
+    } else if (detectedType === 'pdf') {
+      const arrayBuffer = await file.arrayBuffer()
+      const uint8Array = new Uint8Array(arrayBuffer)
+      let binary = ''
+      for (let i = 0; i < uint8Array.length; i += 0x8000) {
+        binary += String.fromCharCode(
+          ...Array.from(uint8Array.subarray(i, i + 0x8000))
+        )
+      }
+      setContent('') // clear text content
+      setFile(file)
+      setType('pdf')
+      setContent(btoa(binary))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    let pdfContent = content
-    if (type === 'pdf' && file) {
-      const arrayBuffer = await file.arrayBuffer()
-      pdfContent = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
+    if (!type && !url && !content) {
+      setValidationError(
+        'Please select a file, enter a URL, or type/paste text.'
+      )
+      return
+    }
+    let docType = type
+    let docContent = content
+    if (url) {
+      docType = 'web'
+      docContent = '' // must be string, not undefined
     }
     const input = {
       projectId,
       title,
-      type,
+      type: docType,
       content:
-        type === 'text' ? content : type === 'pdf' ? pdfContent : undefined,
-      url: type === 'web' ? url : undefined,
+        docType === 'text'
+          ? docContent
+          : docType === 'pdf'
+            ? docContent
+            : undefined,
+      url: docType === 'web' ? url : undefined,
     }
     const { success, data, error } = DocumentSchema.safeParse(input)
     if (!success) {
@@ -65,40 +126,26 @@ function DocumentUploadForm({
         onChange={(e) => setTitle(e.target.value)}
         required
       />
-      <div>
-        <label>Type: </label>
-        <select
-          className="border rounded px-2 py-1"
-          value={type}
-          onChange={(e) => setType(e.target.value as DocumentType)}
-        >
-          <option value="text">Text</option>
-          <option value="pdf">PDF</option>
-          <option value="web">Web URL</option>
-        </select>
-      </div>
-      {type === 'text' && (
+      <Input
+        type="file"
+        accept=".txt,.rtf,text/plain,application/rtf,application/pdf"
+        className="mt-2"
+        onChange={handleFileChange}
+      />
+      <Input
+        type="url"
+        placeholder="https://example.com (optional)"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+      />
+      {!file && !url && (
         <Textarea
           name="content"
           placeholder="Paste or type text here"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={6}
-        />
-      )}
-      {type === 'pdf' && (
-        <Input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-        />
-      )}
-      {type === 'web' && (
-        <Input
-          type="url"
-          placeholder="https://example.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          className="max-h-64 overflow-auto"
         />
       )}
       {validationError && (

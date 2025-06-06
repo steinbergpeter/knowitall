@@ -132,16 +132,17 @@ model Summary {
 }
 
 model Document {
-  id        String   @id @default(cuid())
-  project   Project  @relation(fields: [projectId], references: [id])
-  projectId String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  title     String
-  type      String // e.g., 'pdf', 'web', 'text', etc.
-  url       String? // For web/PDF sources
-  content   String? // Raw text content
-  metadata  Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  project       Project  @relation(fields: [projectId], references: [id])
+  projectId     String
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  title         String
+  type          String // e.g., 'pdf', 'web', 'text', etc.
+  url           String? // For web/PDF sources
+  content       String? // Raw text content
+  extractedText String? // Extracted text from PDF or other sources for AI/graph
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

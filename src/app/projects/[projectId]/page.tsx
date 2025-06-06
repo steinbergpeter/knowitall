@@ -1,9 +1,7 @@
 import ProjectDetailClient from './_components/project-detail-client'
 
 interface ProjectDetailPageProps {
-  params: Promise<{
-    projectId: string
-  }>
+  params: Promise<{ projectId: string }>
 }
 
 export default async function ProjectDetailPage(props: ProjectDetailPageProps) {
