@@ -6,7 +6,7 @@ import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import PasswordModal from './password-modal'
-import ProjectDocumentsSection from './project-documents-section'
+import ProjectDocumentsWrapperProps from './project-documents-wrapper'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -86,7 +86,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         <TabsContent value="documents">
-          <ProjectDocumentsSection projectId={projectId} />
+          <ProjectDocumentsWrapperProps projectId={projectId} />
         </TabsContent>
         <TabsContent value="queries">
           <div className="py-8 text-center text-gray-500">Queries Space</div>

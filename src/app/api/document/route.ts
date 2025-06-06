@@ -4,6 +4,33 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { DocumentSchema } from '@/validations/document'
 import { extractPdfText } from '@/lib/pdf'
+import { JSDOM } from 'jsdom'
+
+async function extractWebPageText(
+  url: string
+): Promise<{ text: string; metadata?: { title?: string; error?: string } }> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error('Failed to fetch web page')
+    const html = await res.text()
+    // Use JSDOM to parse and extract main content
+    const dom = new JSDOM(html)
+    const doc = dom.window.document
+    // Try to extract main content heuristically
+    let text = ''
+    const main = doc.querySelector('main, article')
+    if (main) {
+      text = main.textContent || ''
+    } else {
+      text = doc.body.textContent || ''
+    }
+    // Optionally extract metadata (title, etc)
+    const title = doc.querySelector('title')?.textContent || ''
+    return { text: text.trim(), metadata: { title } }
+  } catch (e) {
+    return { text: '', metadata: { error: (e as Error).message } }
+  }
+}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -20,8 +47,13 @@ export async function POST(req: NextRequest) {
   }
   const { projectId, title, type, url, content, metadata } = docData
   let extractedText: string | undefined = undefined
+  let finalMetadata = metadata
   if (type === 'pdf' && content) {
     extractedText = await extractPdfText(content)
+  } else if (type === 'web' && url) {
+    const { text, metadata: webMeta } = await extractWebPageText(url)
+    extractedText = text
+    finalMetadata = { ...metadata, ...webMeta }
   }
   const document = await prisma.document.create({
     data: {
@@ -32,7 +64,7 @@ export async function POST(req: NextRequest) {
       url,
       content,
       extractedText,
-      metadata,
+      metadata: finalMetadata,
     },
   })
   return NextResponse.json({ document })

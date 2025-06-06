@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/button'
 import ProjectDocumentList from './project-document-list'
 import AddDocumentModal from './add-document-modal'
 
-interface ProjectDocumentsSectionProps {
+interface ProjectDocumentsWrapperProps {
   projectId: string
 }
 
-export default function ProjectDocumentsSection({
+export default function ProjectDocumentsWrapper({
   projectId,
-}: ProjectDocumentsSectionProps) {
+}: ProjectDocumentsWrapperProps) {
   const [showAddDocModal, setShowAddDocModal] = useState(false)
 
   return (

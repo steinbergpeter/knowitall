@@ -40,6 +40,14 @@ export default async function DocumentDetailPage({
           </a>
         </div>
       ) : null}
+      {document.type === 'web' && document.extractedText && (
+        <div className="mb-4">
+          <h2 className="font-semibold text-lg mb-1">Scraped Text</h2>
+          <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm overflow-x-auto max-h-96">
+            {document.extractedText}
+          </pre>
+        </div>
+      )}
       <DocumentViewerClient
         document={{
           title: document.title,
