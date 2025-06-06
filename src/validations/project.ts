@@ -22,6 +22,14 @@ export const CreatedProjectSchema = z.object({
 
 export type CreatedProject = z.infer<typeof CreatedProjectSchema>
 
+export const ProjectCountsSchema = z.object({
+  queries: z.number(),
+  nodes: z.number(),
+  edges: z.number(),
+  summaries: z.number(),
+  documents: z.number(),
+})
+
 export const ProjectDetailSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -34,21 +42,39 @@ export const ProjectDetailSchema = z.object({
   }),
   createdAt: z.string(),
   updatedAt: z.string(),
+  counts: ProjectCountsSchema, // <-- add counts here
 })
 
+export type ProjectCounts = z.infer<typeof ProjectCountsSchema>
 export type ProjectDetail = z.infer<typeof ProjectDetailSchema>
 
-type ProjectWithOwner = Project & {
+type ProjectWithOwnerAndCounts = Project & {
   owner: Pick<User, 'id' | 'name' | 'email'>
+  _count: {
+    queries: number
+    nodes: number
+    edges: number
+    summaries: number
+    documents: number
+  }
 }
-// Helper to transform a Prisma project (with owner) to ProjectDetail
-export function toProjectDetail(project: ProjectWithOwner): ProjectDetail {
+// Helper to transform a Prisma project (with owner and _count) to ProjectDetail
+export function toProjectDetail(
+  project: ProjectWithOwnerAndCounts
+): ProjectDetail {
   return ProjectDetailSchema.parse({
     ...project,
     owner: {
       id: project.owner.id,
       name: project.owner.name,
       email: project.owner.email,
+    },
+    counts: {
+      queries: project._count.queries,
+      nodes: project._count.nodes,
+      edges: project._count.edges,
+      summaries: project._count.summaries,
+      documents: project._count.documents,
     },
     createdAt:
       project.createdAt instanceof Date

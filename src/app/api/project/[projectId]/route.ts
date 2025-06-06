@@ -5,7 +5,7 @@ import { toProjectDetail } from '@/validations/project'
 import { getServerSession } from 'next-auth/next'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-
+import { hashPassword } from '@/lib/password'
 interface Context {
   params: Promise<{ projectId: string }>
 }
@@ -17,7 +17,18 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    include: { owner: true },
+    include: {
+      owner: true,
+      _count: {
+        select: {
+          queries: true,
+          nodes: true,
+          edges: true,
+          summaries: true,
+          documents: true,
+        },
+      },
+    },
   })
   if (!project) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 })
@@ -42,4 +53,38 @@ export async function GET(_req: NextRequest, context: Context) {
   // Return project detail in correct shape
   const projectDetail = toProjectDetail(project)
   return NextResponse.json({ project: projectDetail })
+}
+
+export async function PATCH(req: NextRequest, context: Context) {
+  const { projectId } = await context.params
+
+  const session = await getServerSession(authOptions)
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const project = await prisma.project.findUnique({ where: { id: projectId } })
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+  }
+
+  if (project.ownerId !== session.user.id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const body = await req.json()
+
+  const { password } = body
+
+  if (!password || typeof password !== 'string' || password.length < 1) {
+    return NextResponse.json({ error: 'Password required' }, { status: 400 })
+  }
+  const passwordHash = await hashPassword(password)
+
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { passwordHash, isPublic: false },
+  })
+
+  return NextResponse.json({ ok: true })
 }

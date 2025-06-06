@@ -33,14 +33,22 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
   const { searchParams } = new URL(req.url)
   const projectId = searchParams.get('projectId')
   if (!projectId) {
     return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
+  }
+  // Check if project is public
+  const project = await prisma.project.findUnique({ where: { id: projectId } })
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+  }
+  if (!project.isPublic) {
+    // Require authentication for private projects
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
   const documents = await prisma.document.findMany({
     where: { projectId },

@@ -2,10 +2,10 @@
 
 import { useDocuments } from '@/server-state/queries/useDocuments'
 
-export function ProjectDocumentList({ projectId }: { projectId: string }) {
+function ProjectDocumentList({ projectId }: { projectId: string }) {
   const documentsQuery = useDocuments(projectId)
   return (
-    <div className="mt-8">
+    <div className="mt-8 bg-green-500">
       <h2 className="text-lg font-semibold mb-2">Project Documents</h2>
       {documentsQuery.isLoading ? (
         <div>Loading documents...</div>
@@ -41,3 +41,5 @@ export function ProjectDocumentList({ projectId }: { projectId: string }) {
     </div>
   )
 }
+
+export default ProjectDocumentList

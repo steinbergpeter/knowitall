@@ -7,7 +7,7 @@ import { useCreateDocument } from '@/server-state/mutations/useCreateDocument'
 import { DocumentSchema, type DocumentType } from '@/validations/document'
 import { useState } from 'react'
 
-export function DocumentUploadForm({
+function DocumentUploadForm({
   projectId,
   onUploaded,
 }: {
@@ -111,3 +111,5 @@ export function DocumentUploadForm({
     </form>
   )
 }
+
+export default DocumentUploadForm
