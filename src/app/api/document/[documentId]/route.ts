@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
@@ -7,7 +7,7 @@ interface Context {
   params: Promise<{ documentId: string }>
 }
 
-export async function GET(context: Context) {
+export async function GET(_req: NextRequest, context: Context) {
   const { documentId } = await context.params
   const session = await getServerSession(authOptions)
   if (!documentId) {
