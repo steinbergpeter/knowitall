@@ -5,7 +5,7 @@ import { useDocuments } from '@/server-state/queries/useDocuments'
 function ProjectDocumentList({ projectId }: { projectId: string }) {
   const documentsQuery = useDocuments(projectId)
   return (
-    <div className="mt-8 bg-green-500">
+    <div className="mt-8">
       <h2 className="text-lg font-semibold mb-2">Project Documents</h2>
       {documentsQuery.isLoading ? (
         <div>Loading documents...</div>

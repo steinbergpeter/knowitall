@@ -1,10 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
+import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import AddDocumentModal from './add-document-modal'
 import PasswordModal from './password-modal'
+import ProjectDocumentList from './project-document-list'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -12,7 +15,8 @@ interface ProjectDetailClientProps {
 
 function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   const { data, isLoading, error, refetch } = useProjectDetail(projectId)
-  const [showModal, setShowModal] = useState(false)
+  const { data: session } = useSession()
+  const [showAddDocModal, setShowAddDocModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [currentPassword, setCurrentPassword] = useState<string | null>(null)
 
@@ -59,15 +63,12 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   } = data
   // Determine if current user is owner
   const isOwner =
-    data.project.owner?.id ===
-    (typeof window !== 'undefined'
-      ? window.__NEXT_DATA__?.props?.pageProps?.session?.user?.id
-      : undefined)
+    session?.user?.id && data.project.owner?.id === session.user.id
   // If you have userId in props or context, use that instead for reliability
 
   return (
-    <div className="w-full rounded shadow p-6 flex justify-between">
-      <div>
+    <div className="w-full mx-auto rounded shadow p-12 pt-0 ">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">{name}</h1>
         <p className="text-gray-600 mb-2">{description}</p>
         <div className="text-sm text-gray-800 mb-2">
@@ -79,33 +80,52 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-end">
-        <Button onClick={() => setShowModal(true)} className="mb-4">
-          Add Document
-        </Button>
-        {isOwner && (
-          <Button
-            onClick={handleOpenPasswordModal}
-            className="mb-4"
-            variant="secondary"
-          >
-            Password
-          </Button>
-        )}
-      </div>
-      <AddDocumentModal
-        showModal={showModal}
-        setShowModal={setShowModal}
-        projectId={projectId}
-      />
-      {isOwner && (
-        <PasswordModal
-          showModal={showPasswordModal}
-          setShowModal={setShowPasswordModal}
-          currentPassword={currentPassword}
-          onPasswordReset={handlePasswordReset}
-        />
-      )}
+      <Tabs defaultValue="documents" className="w-full">
+        <TabsList>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="queries">Queries</TabsTrigger>
+          <TabsTrigger value="graph">Graph</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="documents">
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => setShowAddDocModal(true)}>
+              Add Document
+            </Button>
+          </div>
+          <ProjectDocumentList projectId={projectId} />
+          <AddDocumentModal
+            showModal={showAddDocModal}
+            setShowModal={setShowAddDocModal}
+            projectId={projectId}
+          />
+        </TabsContent>
+        <TabsContent value="queries">
+          <div className="py-8 text-center text-gray-500">Queries Space</div>
+        </TabsContent>
+        <TabsContent value="graph">
+          <div className="py-8 text-center text-gray-500">Graph Space</div>
+        </TabsContent>
+        <TabsContent value="settings">
+          {isOwner && (
+            <div className="flex flex-col items-center mt-4">
+              <Button
+                onClick={handleOpenPasswordModal}
+                variant="secondary"
+                className="mb-4"
+              >
+                Password
+              </Button>
+              <PasswordModal
+                showModal={showPasswordModal}
+                setShowModal={setShowPasswordModal}
+                currentPassword={currentPassword}
+                onPasswordReset={handlePasswordReset}
+              />
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
       {/* More project details and actions will go here */}
     </div>
   )
