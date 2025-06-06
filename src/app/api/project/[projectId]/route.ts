@@ -8,10 +8,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   _req: NextRequest,
-  context: { params: { projectId: string } }
+  context: { params: Promise<{ projectId: string }> }
 ) {
-  const params = context.params
-  const { projectId } = params
+  const { projectId } = await context.params
   if (!projectId) {
     return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
   }

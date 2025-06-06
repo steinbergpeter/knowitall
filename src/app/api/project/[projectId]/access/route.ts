@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   req: NextRequest,
-  context: { params: { projectId: string } }
+  context: { params: Promise<{ projectId: string }> }
 ) {
-  const { projectId } = context.params
+  const { projectId } = await context.params
   const { password } = await req.json()
   if (!projectId || !password) {
     return NextResponse.json(

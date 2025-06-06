@@ -1,14 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: { documentId: string } }
-) {
+export async function GET(context: {
+  params: Promise<{ documentId: string }>
+}) {
+  const { documentId } = await context.params
   const session = await getServerSession(authOptions)
-  const { documentId } = params
   if (!documentId) {
     return NextResponse.json({ error: 'Missing documentId' }, { status: 400 })
   }
