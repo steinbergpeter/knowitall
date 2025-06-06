@@ -3,9 +3,11 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
-export async function GET(context: {
+interface Context {
   params: Promise<{ documentId: string }>
-}) {
+}
+
+export async function GET(context: Context) {
   const { documentId } = await context.params
   const session = await getServerSession(authOptions)
   if (!documentId) {

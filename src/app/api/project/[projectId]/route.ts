@@ -6,10 +6,11 @@ import { getServerSession } from 'next-auth/next'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(
-  _req: NextRequest,
-  context: { params: Promise<{ projectId: string }> }
-) {
+interface Context {
+  params: Promise<{ projectId: string }>
+}
+
+export async function GET(_req: NextRequest, context: Context) {
   const { projectId } = await context.params
   if (!projectId) {
     return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })

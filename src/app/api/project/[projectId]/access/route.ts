@@ -2,10 +2,11 @@ import { verifyPassword } from '@/lib/password'
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(
-  req: NextRequest,
-  context: { params: Promise<{ projectId: string }> }
-) {
+interface Context {
+  params: Promise<{ projectId: string }>
+}
+
+export async function POST(req: NextRequest, context: Context) {
   const { projectId } = await context.params
   const { password } = await req.json()
   if (!projectId || !password) {
