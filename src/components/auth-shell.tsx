@@ -6,12 +6,12 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 interface AuthShellProps {
   title: string
   children: ReactNode
   oauthLabel: string
-  oauthAction: string
   switchText: string
   switchHref: string
 }
@@ -20,12 +20,14 @@ export function AuthShell({
   title,
   children,
   oauthLabel,
-  oauthAction,
   switchText,
   switchHref,
 }: AuthShellProps) {
   const router = useRouter()
   const close = () => router.back()
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl: '/' })
+  }
   return (
     <div className="relative">
       <Button
@@ -49,16 +51,15 @@ export function AuthShell({
           <div className="flex-1 h-px bg-muted-foreground/20" />
         </div>
 
-        <form method="post" action={oauthAction} className="w-full">
-          <Button
-            type="submit"
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2"
-          >
-            {/* Google SVG here */}
-            {oauthLabel}
-          </Button>
-        </form>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={handleGoogleSignIn}
+        >
+          {/* Google SVG here */}
+          {oauthLabel}
+        </Button>
 
         <div className="text-center text-sm text-muted-foreground">
           {switchText}{' '}

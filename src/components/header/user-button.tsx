@@ -42,7 +42,7 @@ const UserButton = ({ user }: UserButtonProps) => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/api/auth/signout" className="flex items-center gap-2">
+          <Link href="/signout" className="flex items-center gap-2">
             <LogOut className="w-4 h-4" /> Sign out
           </Link>
         </DropdownMenuItem>

@@ -7,7 +7,6 @@ export default function RegisterPage() {
       <AuthShell
         title="Create an Account"
         oauthLabel="Sign up with Google"
-        oauthAction="/api/auth/signin/google"
         switchText="Already have an account?"
         switchHref="/signin"
       >
