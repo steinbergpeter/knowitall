@@ -4,15 +4,16 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { NodeSchema } from '@/validations/knowledge-graph'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { nodeId: string } }
-) {
+interface Context {
+  params: Promise<{ nodeId: string }>
+}
+
+export async function GET(_req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { nodeId } = params
+  const { nodeId } = await context.params
   if (!nodeId) {
     return NextResponse.json({ error: 'Missing nodeId' }, { status: 400 })
   }
@@ -25,15 +26,12 @@ export async function GET(
   return NextResponse.json({ node })
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { nodeId: string } }
-) {
+export async function PATCH(req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { nodeId } = params
+  const { nodeId } = await context.params
   if (!nodeId) {
     return NextResponse.json({ error: 'Missing nodeId' }, { status: 400 })
   }
@@ -52,15 +50,12 @@ export async function PATCH(
   return NextResponse.json({ node })
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { nodeId: string } }
-) {
+export async function DELETE(_req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { nodeId } = params
+  const { nodeId } = await context.params
   if (!nodeId) {
     return NextResponse.json({ error: 'Missing nodeId' }, { status: 400 })
   }

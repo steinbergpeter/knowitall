@@ -4,15 +4,16 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { EdgeSchema } from '@/validations/knowledge-graph'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { edgeId: string } }
-) {
+interface Context {
+  params: Promise<{ edgeId: string }>
+}
+
+export async function GET(_req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { edgeId } = params
+  const { edgeId } = await context.params
   if (!edgeId) {
     return NextResponse.json({ error: 'Missing edgeId' }, { status: 400 })
   }
@@ -25,15 +26,12 @@ export async function GET(
   return NextResponse.json({ edge })
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { edgeId: string } }
-) {
+export async function PATCH(req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { edgeId } = params
+  const { edgeId } = await context.params
   if (!edgeId) {
     return NextResponse.json({ error: 'Missing edgeId' }, { status: 400 })
   }
@@ -52,15 +50,12 @@ export async function PATCH(
   return NextResponse.json({ edge })
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: { edgeId: string } }
-) {
+export async function DELETE(_req: NextRequest, context: Context) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const { edgeId } = params
+  const { edgeId } = await context.params
   if (!edgeId) {
     return NextResponse.json({ error: 'Missing edgeId' }, { status: 400 })
   }
