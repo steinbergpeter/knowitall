@@ -5,9 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
-import AddDocumentModal from './add-document-modal'
 import PasswordModal from './password-modal'
-import ProjectDocumentList from './project-document-list'
+import ProjectDocumentsSection from './project-documents-section'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -16,7 +15,6 @@ interface ProjectDetailClientProps {
 function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   const { data, isLoading, error, refetch } = useProjectDetail(projectId)
   const { data: session } = useSession()
-  const [showAddDocModal, setShowAddDocModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [currentPassword, setCurrentPassword] = useState<string | null>(null)
 
@@ -68,7 +66,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
 
   return (
     <div className="w-full mx-auto rounded shadow p-12 pt-0 ">
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">{name}</h1>
         <p className="text-gray-600 mb-2">{description}</p>
         <div className="text-sm text-gray-800 mb-2">
@@ -88,17 +86,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         <TabsContent value="documents">
-          <div className="flex justify-end mb-4">
-            <Button onClick={() => setShowAddDocModal(true)}>
-              Add Document
-            </Button>
-          </div>
-          <ProjectDocumentList projectId={projectId} />
-          <AddDocumentModal
-            showModal={showAddDocModal}
-            setShowModal={setShowAddDocModal}
-            projectId={projectId}
-          />
+          <ProjectDocumentsSection projectId={projectId} />
         </TabsContent>
         <TabsContent value="queries">
           <div className="py-8 text-center text-gray-500">Queries Space</div>

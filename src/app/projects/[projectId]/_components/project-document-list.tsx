@@ -8,7 +8,6 @@ function ProjectDocumentList({ projectId }: { projectId: string }) {
 
   return (
     <div className="mt-8">
-      <h2 className="text-lg font-semibold mb-2">Project Documents</h2>
       {isLoading ? (
         <div>Loading documents...</div>
       ) : error ? (
