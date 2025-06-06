@@ -1,8 +1,10 @@
 import Image from 'next/image'
+import PrefetchProjects from '@/components/prefetch-projects'
 
 export default function HomePage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen py-12">
+      <PrefetchProjects />
       <Image
         src="/globe.svg"
         alt="Knowledge Globe"

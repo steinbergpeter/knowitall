@@ -43,29 +43,10 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ project })
 }
 
-export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  const { searchParams } = new URL(req.url)
-  const publicOnly = searchParams.get('guest') === 'true'
-
-  if (publicOnly) {
-    // Return all public projects
-    const projects = await prisma.project.findMany({
-      where: { isPublic: true },
-      orderBy: { createdAt: 'desc' },
-    })
-    return NextResponse.json({ projects })
-  }
-
-  if (session && session.user) {
-    // Return all projects owned by the user
-    const projects = await prisma.project.findMany({
-      where: { ownerId: session.user.id },
-      orderBy: { createdAt: 'desc' },
-    })
-    return NextResponse.json({ projects })
-  }
-
-  // If not logged in and not requesting public, return empty
-  return NextResponse.json({ projects: [] })
+export async function GET() {
+  // Always return all projects, regardless of session or guest
+  const projects = await prisma.project.findMany({
+    orderBy: { createdAt: 'desc' },
+  })
+  return NextResponse.json({ projects })
 }

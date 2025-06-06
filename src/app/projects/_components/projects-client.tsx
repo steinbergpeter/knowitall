@@ -6,9 +6,12 @@ import { useProjects } from '@/server-state/queries/useProjects'
 import ProjectInList from '@/app/projects/_components/project-in-list'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useSession } from 'next-auth/react'
 
 export default function ProjectsClient() {
   const { data: projects, isLoading, error, refetch } = useProjects()
+  const { data: session } = useSession()
+  const userId = session?.user?.id
   const [showForm, setShowForm] = useState(false)
 
   return (
@@ -37,7 +40,11 @@ export default function ProjectsClient() {
         <div className="space-y-4">
           {projects && projects.length > 0 ? (
             projects.map((project) => (
-              <ProjectInList key={project.id} project={project} />
+              <ProjectInList
+                key={project.id}
+                project={project}
+                userId={userId}
+              />
             ))
           ) : (
             <div className="text-gray-500">No projects found.</div>

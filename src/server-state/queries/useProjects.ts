@@ -4,15 +4,14 @@ import {
   type CreatedProject,
 } from '@/validations/project'
 
-export const useProjects = (guest: boolean = false) =>
+export const useProjects = () =>
   useQuery<CreatedProject[], Error>({
-    queryKey: ['projects', { guest }],
-    queryFn: () => getProjects(guest),
+    queryKey: ['projects'],
+    queryFn: getProjects,
   })
 
-const getProjects = async (guest: boolean): Promise<CreatedProject[]> => {
-  const url = guest ? '/api/project?guest=true' : '/api/project'
-  const res = await fetch(url)
+export const getProjects = async (): Promise<CreatedProject[]> => {
+  const res = await fetch('/api/project')
   if (!res.ok) throw new Error('Failed to fetch projects')
   const data = await res.json()
   return CreatedProjectSchema.array().parse(data.projects)

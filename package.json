@@ -22,6 +22,7 @@
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@tanstack/react-query": "^5.80.2",
+    "@tanstack/react-query-devtools": "^5.80.6",
     "@xyflow/react": "^12.6.4",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",

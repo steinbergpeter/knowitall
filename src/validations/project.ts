@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Project, User } from '@prisma/client'
 
 export const ProjectSchema = z.object({
   name: z.string().trim().min(2, 'Project name is required').max(100),
@@ -36,3 +37,32 @@ export const ProjectDetailSchema = z.object({
 })
 
 export type ProjectDetail = z.infer<typeof ProjectDetailSchema>
+
+type ProjectWithOwner = Project & {
+  owner: Pick<User, 'id' | 'name' | 'email'>
+}
+// Helper to transform a Prisma project (with owner) to ProjectDetail
+export function toProjectDetail(project: ProjectWithOwner): ProjectDetail {
+  return ProjectDetailSchema.parse({
+    ...project,
+    owner: {
+      id: project.owner.id,
+      name: project.owner.name,
+      email: project.owner.email,
+    },
+    createdAt:
+      project.createdAt instanceof Date
+        ? project.createdAt.toISOString()
+        : project.createdAt,
+    updatedAt:
+      project.updatedAt instanceof Date
+        ? project.updatedAt.toISOString()
+        : project.updatedAt,
+  })
+}
+
+export const ProjectDetailApiSchema = z.object({
+  project: ProjectDetailSchema,
+})
+
+export type ProjectDetailApi = z.infer<typeof ProjectDetailApiSchema>
