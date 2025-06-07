@@ -51,6 +51,9 @@ export async function GET(req: NextRequest) {
   const where: { projectId?: string; researchQueryId?: string } = {}
   if (projectId) where.projectId = projectId
   if (researchQueryId) where.researchQueryId = researchQueryId
-  const summarys = await prisma.summary.findMany({ where })
+  const summarys = await prisma.summary.findMany({
+    where,
+    include: { document: true },
+  })
   return NextResponse.json({ summarys })
 }

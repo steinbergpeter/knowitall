@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   const edge = await prisma.edge.findUnique({
     where: { id: edgeId },
+    include: { document: true },
   })
   if (!edge) {
     return NextResponse.json({ error: 'Edge not found' }, { status: 404 })
@@ -49,6 +50,7 @@ export async function PATCH(req: NextRequest, context: Context) {
       ...parsed.data,
       ...(parsed.data.documentId ? { documentId: parsed.data.documentId } : {}),
     },
+    include: { document: true },
   })
   return NextResponse.json({ edge })
 }

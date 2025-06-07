@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   const node = await prisma.node.findUnique({
     where: { id: nodeId },
+    include: { document: true },
   })
   if (!node) {
     return NextResponse.json({ error: 'Node not found' }, { status: 404 })
@@ -49,6 +50,7 @@ export async function PATCH(req: NextRequest, context: Context) {
       ...parsed.data,
       ...(parsed.data.documentId ? { documentId: parsed.data.documentId } : {}),
     },
+    include: { document: true },
   })
   return NextResponse.json({ node })
 }
