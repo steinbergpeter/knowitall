@@ -25,6 +25,20 @@ const eslintConfig = [
       // You can override/add more rules here if needed
       'react/react-in-jsx-scope': 'off',
     },
+    ignores: [
+      'node_modules',
+      'dist',
+      'build',
+      'out',
+      'coverage',
+      '.next',
+      '.turbo',
+      'public/static/js/*.js',
+      '**/package.json',
+      '**/package-lock.json',
+      '**/pnpm-lock.yaml',
+      '**/pnpm-workspace.yaml',
+    ],
   },
 ]
 

@@ -1,11 +1,18 @@
+import { PdfReader } from 'pdfreader'
+
 export async function extractPdfText(
   base64: string
 ): Promise<string | undefined> {
-  const pdfParse = (await import('pdf-parse')).default
   try {
     const pdfBuffer = Buffer.from(base64, 'base64')
-    const data = await pdfParse(pdfBuffer)
-    return data.text
+    return await new Promise<string | undefined>((resolve, reject) => {
+      let text = ''
+      new PdfReader().parseBuffer(pdfBuffer, (err, item) => {
+        if (err) return reject(err)
+        if (!item) return resolve(text.trim() || undefined)
+        if (item.text) text += item.text + ' '
+      })
+    })
   } catch {
     return undefined
   }

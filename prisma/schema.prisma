@@ -79,7 +79,7 @@ model Project {
 
 model Query {
   id        String   @id @default(cuid())
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
   queryText String
   createdAt DateTime @default(now())
@@ -92,7 +92,7 @@ model Query {
 
 model Node {
   id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   label           String
   type            String
@@ -106,7 +106,7 @@ model Node {
 
 model Edge {
   id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   source          String // Node id
   target          String // Node id
@@ -121,7 +121,7 @@ model Edge {
 
 model Summary {
   id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   text            String
   createdAt       DateTime @default(now())
@@ -133,7 +133,7 @@ model Summary {
 
 model Document {
   id            String   @id @default(cuid())
-  project       Project  @relation(fields: [projectId], references: [id])
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId     String
   user          User     @relation(fields: [userId], references: [id])
   userId        String

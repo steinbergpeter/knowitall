@@ -17,7 +17,7 @@ export default function ProjectsClient() {
   return (
     <div className="w-full max-w-2xl mx-auto py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Your Projects</h1>
+        <h1 className="text-2xl font-bold">Projects</h1>
         <Button onClick={() => setShowForm((v) => !v)}>
           {showForm ? 'Cancel' : 'New Project'}
         </Button>

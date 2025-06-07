@@ -1,7 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import React from 'react'
 import DocumentUploadForm from './document-upload-form'
-import { Button } from '@/components/ui/button'
 
 interface AddDocumentModalProps {
   showModal: boolean
@@ -21,16 +20,9 @@ const AddDocumentModal = ({
         <DocumentUploadForm
           projectId={projectId}
           onUploaded={() => setShowModal(false)}
+          showCancel={true}
+          onCancel={() => setShowModal(false)}
         />
-        <div className="flex justify-end mt-2">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={() => setShowModal(false)}
-          >
-            Cancel
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   )

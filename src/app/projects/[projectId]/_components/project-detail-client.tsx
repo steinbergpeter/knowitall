@@ -1,13 +1,16 @@
 'use client'
 
+import ProjectBreadcrumbs from '@/components/project-breadcrumbs'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useDeleteProject } from '@/server-state/mutations/useDeleteProject'
 import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
+import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import PasswordModal from './password-modal'
+import ProjectDeleteModal from './project-delete-modal'
 import ProjectDocumentsWrapperProps from './project-documents-wrapper'
-import ProjectBreadcrumbs from '@/components/project-breadcrumbs'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -17,23 +20,10 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   const { data, isLoading, error, refetch } = useProjectDetail(projectId)
   const { data: session } = useSession()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [currentPassword, setCurrentPassword] = useState<string | null>(null)
-
-  // Fetch the current password (for demo: you may want to secure this in production)
-  const fetchPassword = async () => {
-    const res = await fetch(`/api/project/${projectId}`)
-    if (res.ok) {
-      const d = await res.json()
-      setCurrentPassword(d.project.password || '')
-    } else {
-      setCurrentPassword('')
-    }
-  }
-
-  const handleOpenPasswordModal = async () => {
-    await fetchPassword()
-    setShowPasswordModal(true)
-  }
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const onSuccess = () => (window.location.href = '/projects')
+  const { mutate: deleteProject, isPending: isDeletingProject } =
+    useDeleteProject(onSuccess)
 
   const handlePasswordReset = async (newPassword: string) => {
     const res = await fetch(`/api/project/${projectId}`, {
@@ -48,6 +38,19 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
     refetch()
   }
 
+  // Fix: Make handleDeleteProject async to match modal's expected signature
+  async function handleDeleteProject(password: string, projectName: string) {
+    await new Promise<void>((resolve, reject) => {
+      deleteProject(
+        { projectId, password, projectName },
+        {
+          onSuccess: () => resolve(),
+          onError: (err) => reject(err),
+        }
+      )
+    })
+  }
+
   if (isLoading) {
     return <div className="mt-8">Loading project...</div>
   }
@@ -58,7 +61,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
     return <div className="mt-8 text-gray-500">Project not found.</div>
   }
   const {
-    project: { counts, name, description, owner },
+    project: { counts, name, description, owner, isPublic },
   } = data
   // Determine if current user is owner
   const isOwner =
@@ -74,6 +77,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
         <div className="text-sm text-gray-800 mb-2">
           Owner: {owner?.name || owner?.email || 'Unknown'}
           <div className="flex flex-col gap-1 mt-2 text-gray-500">
+            <p>Privacy: {isPublic ? 'Public' : 'Private'}</p>
             <p>Documents: {counts.documents}</p>
             <p>Summaries: {counts.summaries}</p>
             <p>Queries: {counts.queries}</p>
@@ -98,19 +102,35 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
         </TabsContent>
         <TabsContent value="settings">
           {isOwner && (
-            <div className="flex flex-col items-center mt-4">
+            <div className="flex flex-col items-center mt-4 gap-4">
               <Button
-                onClick={handleOpenPasswordModal}
+                onClick={() => setShowPasswordModal(true)}
                 variant="secondary"
                 className="mb-4"
               >
-                Password
+                Reset Password
               </Button>
               <PasswordModal
                 showModal={showPasswordModal}
                 setShowModal={setShowPasswordModal}
-                currentPassword={currentPassword}
                 onPasswordReset={handlePasswordReset}
+                isPublic={isPublic}
+              />
+              {/* Project Delete Trigger */}
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setShowDeleteModal(true)}
+                title="Delete Project"
+              >
+                <Trash2 />
+              </Button>
+              <ProjectDeleteModal
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onDelete={handleDeleteProject}
+                projectName={name}
+                isDeleting={isDeletingProject}
               />
             </div>
           )}

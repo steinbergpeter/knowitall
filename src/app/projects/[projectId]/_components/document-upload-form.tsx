@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useCreateDocument } from '@/server-state/mutations/useCreateDocument'
 import { DocumentSchema } from '@/validations/document'
 import { useState } from 'react'
+import { CloudUpload, X, LoaderCircle } from 'lucide-react'
 
 function getFileType(file: File): 'pdf' | 'text' | 'web' | null {
   const ext = file.name.split('.').pop()?.toLowerCase()
@@ -23,9 +24,13 @@ function getFileType(file: File): 'pdf' | 'text' | 'web' | null {
 function DocumentUploadForm({
   projectId,
   onUploaded,
+  showCancel,
+  onCancel,
 }: {
   projectId: string
   onUploaded?: () => void
+  showCancel?: boolean
+  onCancel?: () => void
 }) {
   const [type, setType] = useState<'text' | 'pdf' | 'web' | null>(null)
   const [title, setTitle] = useState('')
@@ -152,9 +157,25 @@ function DocumentUploadForm({
         <div className="text-red-500 text-sm">{validationError}</div>
       )}
       {error && <div className="text-red-500 text-sm">{error.message}</div>}
-      <Button type="submit" disabled={isPending}>
-        {isPending ? 'Uploading...' : 'Upload Document'}
-      </Button>
+      <div className="flex gap-2 justify-end">
+        {showCancel && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            size="icon"
+          >
+            <X />
+          </Button>
+        )}
+        <Button type="submit" disabled={isPending} size="icon">
+          {isPending ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <CloudUpload />
+          )}
+        </Button>
+      </div>
     </form>
   )
 }

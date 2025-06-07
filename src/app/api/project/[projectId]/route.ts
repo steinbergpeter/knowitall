@@ -88,3 +88,49 @@ export async function PATCH(req: NextRequest, context: Context) {
 
   return NextResponse.json({ ok: true })
 }
+
+export async function DELETE(req: NextRequest, context: Context) {
+  const { projectId } = await context.params
+  const session = await getServerSession(authOptions)
+  const body = await req.json()
+  const { password, projectName } = body
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: { documents: true },
+  })
+  if (!project) {
+    return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+  }
+  // Only owner can delete
+  if (!session || !session.user || project.ownerId !== session.user.id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  if (!password || !projectName) {
+    return NextResponse.json(
+      { error: 'Password and project name required' },
+      { status: 400 }
+    )
+  }
+  if (project.name !== projectName) {
+    return NextResponse.json(
+      { error: 'Project name does not match' },
+      { status: 400 }
+    )
+  }
+  if (!project.passwordHash) {
+    return NextResponse.json(
+      { error: 'Project password not set' },
+      { status: 400 }
+    )
+  }
+  const valid = await verifyPassword(password, project.passwordHash)
+  if (!valid) {
+    return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
+  }
+  // Delete all documents/files associated with the project
+  await prisma.document.deleteMany({ where: { projectId } })
+  // Delete the project
+  await prisma.project.delete({ where: { id: projectId } })
+  return NextResponse.json({ ok: true })
+}
