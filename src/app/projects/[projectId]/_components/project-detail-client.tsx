@@ -1,15 +1,14 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { TabsContent } from '@/components/ui/tabs'
 import { useDeleteProject } from '@/server-state/mutations/useDeleteProject'
 import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
 import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import ProjectDocumentsWrapperProps from './documents-tab/project-documents-wrapper'
-import PasswordModal from './password-modal'
-import ProjectDeleteModal from './project-delete-modal'
+import PasswordModal from './modals/password-modal'
+import ProjectDeleteModal from './modals/project-delete-modal'
 import ProjectHeader from './project-header'
 import QueryPanel from './query-tab/query-panel'
 
@@ -22,6 +21,9 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   const { data: session } = useSession()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [activeTab, setActiveTab] = useState<
+    'queries' | 'documents' | 'graph' | 'settings'
+  >('queries')
   const onSuccess = () => (window.location.href = '/projects')
   const { mutate: deleteProject, isPending: isDeletingProject } =
     useDeleteProject(onSuccess)
@@ -87,53 +89,51 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
         owner={safeOwner}
         isPublic={isPublic}
         counts={counts}
-      >
-        <TabsContent value="queries">
-          <QueryPanel projectId={projectId} />
-        </TabsContent>
-        <TabsContent value="documents">
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+      <div className="mt-8">
+        {activeTab === 'queries' && <QueryPanel projectId={projectId} />}
+        {activeTab === 'documents' && (
           <ProjectDocumentsWrapperProps projectId={projectId} />
-        </TabsContent>
-        <TabsContent value="graph">
+        )}
+        {activeTab === 'graph' && (
           <div className="py-8 text-center text-gray-500">Graph Space</div>
-        </TabsContent>
-        <TabsContent value="settings">
-          {safeIsOwner && (
-            <div className="flex flex-col items-center mt-4 gap-4">
-              <Button
-                onClick={() => setShowPasswordModal(true)}
-                variant="secondary"
-                className="mb-4"
-              >
-                Reset Password
-              </Button>
-              <PasswordModal
-                showModal={showPasswordModal}
-                setShowModal={setShowPasswordModal}
-                onPasswordReset={handlePasswordReset}
-                isPublic={isPublic}
-              />
-              {/* Project Delete Trigger */}
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => setShowDeleteModal(true)}
-                title="Delete Project"
-              >
-                <Trash2 />
-              </Button>
-              <ProjectDeleteModal
-                open={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                onDelete={handleDeleteProject}
-                projectName={name}
-                isDeleting={isDeletingProject}
-              />
-            </div>
-          )}
-        </TabsContent>
-      </ProjectHeader>
-      {/* More project details and actions will go here */}
+        )}
+        {activeTab === 'settings' && safeIsOwner && (
+          <div className="flex flex-col items-center mt-4 gap-4">
+            <Button
+              onClick={() => setShowPasswordModal(true)}
+              variant="secondary"
+              className="mb-4"
+            >
+              Reset Password
+            </Button>
+            <PasswordModal
+              showModal={showPasswordModal}
+              setShowModal={setShowPasswordModal}
+              onPasswordReset={handlePasswordReset}
+              isPublic={isPublic}
+            />
+            {/* Project Delete Trigger */}
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => setShowDeleteModal(true)}
+              title="Delete Project"
+            >
+              <Trash2 />
+            </Button>
+            <ProjectDeleteModal
+              open={showDeleteModal}
+              onClose={() => setShowDeleteModal(false)}
+              onDelete={handleDeleteProject}
+              projectName={name}
+              isDeleting={isDeletingProject}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

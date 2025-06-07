@@ -56,7 +56,7 @@ export default function QueryPanel({ projectId }: QueryPanelProps) {
   }
 
   return (
-    <div className="mx-auto py-8 flex flex-col items-center gap-6 min-h-[70vh] bg-pink-500">
+    <div className="mx-auto py-2 flex flex-col items-center gap-6 min-h-[70vh]">
       {/* CHAT HISTORY */}
       <div className="w-full max-w-xl flex-1 flex flex-col gap-6 overflow-y-auto mb-4 border border-gray-300 rounded-lg bg-white shadow-sm p-4">
         {chatHistory.map((item, idx) => (
