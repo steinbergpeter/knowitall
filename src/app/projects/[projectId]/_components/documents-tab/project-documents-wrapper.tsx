@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import ProjectDocumentList from './project-document-list'
+import { useState } from 'react'
 import AddDocumentModal from './add-document-modal'
+import ProjectDocumentList from './project-document-list'
 
 interface ProjectDocumentsWrapperProps {
   projectId: string

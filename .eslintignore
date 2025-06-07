@@ -1,1 +1,1 @@
-package.json
+# .eslintignore is deprecated. All ignore patterns have been moved to the 'ignores' property in eslint.config.mjs as per ESLint 9+ migration guide.

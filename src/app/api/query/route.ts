@@ -27,7 +27,15 @@ export async function POST(req: NextRequest) {
   const query = await prisma.query.create({
     data,
   })
-  return NextResponse.json({ query })
+
+  // Simulate AI response (replace with real AI call as needed)
+  const aiResponse = `AI: This is a response to your query: "${parsed.data.query}"`
+
+  // Return only the query and aiResponse (no knowledge graph, nodes, edges, summaries)
+  return NextResponse.json({
+    query,
+    aiResponse,
+  })
 }
 
 // List all research queries for a project

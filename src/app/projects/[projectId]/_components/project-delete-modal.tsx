@@ -1,14 +1,14 @@
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Trash2, X, LoaderCircle } from 'lucide-react'
+import { LoaderCircle, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
 
 interface ProjectDeleteModalProps {
   open: boolean

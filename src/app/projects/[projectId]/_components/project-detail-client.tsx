@@ -1,16 +1,17 @@
 'use client'
 
-import ProjectBreadcrumbs from '@/components/project-breadcrumbs'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TabsContent } from '@/components/ui/tabs'
 import { useDeleteProject } from '@/server-state/mutations/useDeleteProject'
 import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
 import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
+import ProjectDocumentsWrapperProps from './documents-tab/project-documents-wrapper'
 import PasswordModal from './password-modal'
 import ProjectDeleteModal from './project-delete-modal'
-import ProjectDocumentsWrapperProps from './project-documents-wrapper'
+import ProjectHeader from './project-header'
+import QueryPanel from './query-tab/query-panel'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -64,44 +65,40 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
     project: { counts, name, description, owner, isPublic },
   } = data
   // Determine if current user is owner
-  const isOwner =
-    session?.user?.id && data.project.owner?.id === session.user.id
+  // const isOwner = session?.user?.id && data.project.owner?.id === session.user.id
   // If you have userId in props or context, use that instead for reliability
 
+  // Defensive: ensure types for ProjectHeader props
+  const safeDescription = description ?? ''
+  const safeOwner = owner
+    ? { name: owner.name ?? undefined, email: owner.email ?? undefined }
+    : { name: undefined, email: undefined }
+  const safeIsOwner = Boolean(
+    typeof session?.user?.id === 'string' &&
+      data.project.owner?.id === session?.user?.id
+  )
+
   return (
-    <div className="w-full mx-auto rounded shadow p-12 pt-0 ">
-      <ProjectBreadcrumbs projectId={projectId} projectName={name} />
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">{name}</h1>
-        <p className="text-gray-600 mb-2">{description}</p>
-        <div className="text-sm text-gray-800 mb-2">
-          Owner: {owner?.name || owner?.email || 'Unknown'}
-          <div className="flex flex-col gap-1 mt-2 text-gray-500">
-            <p>Privacy: {isPublic ? 'Public' : 'Private'}</p>
-            <p>Documents: {counts.documents}</p>
-            <p>Summaries: {counts.summaries}</p>
-            <p>Queries: {counts.queries}</p>
-          </div>
-        </div>
-      </div>
-      <Tabs defaultValue="documents" className="w-full">
-        <TabsList>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="queries">Queries</TabsTrigger>
-          <TabsTrigger value="graph">Graph</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
+    <div className="w-full mx-auto rounded shadow p-12 pt-0">
+      <ProjectHeader
+        projectId={projectId}
+        name={name}
+        description={safeDescription}
+        owner={safeOwner}
+        isPublic={isPublic}
+        counts={counts}
+      >
+        <TabsContent value="queries">
+          <QueryPanel projectId={projectId} />
+        </TabsContent>
         <TabsContent value="documents">
           <ProjectDocumentsWrapperProps projectId={projectId} />
-        </TabsContent>
-        <TabsContent value="queries">
-          <div className="py-8 text-center text-gray-500">Queries Space</div>
         </TabsContent>
         <TabsContent value="graph">
           <div className="py-8 text-center text-gray-500">Graph Space</div>
         </TabsContent>
         <TabsContent value="settings">
-          {isOwner && (
+          {safeIsOwner && (
             <div className="flex flex-col items-center mt-4 gap-4">
               <Button
                 onClick={() => setShowPasswordModal(true)}
@@ -135,7 +132,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
             </div>
           )}
         </TabsContent>
-      </Tabs>
+      </ProjectHeader>
       {/* More project details and actions will go here */}
     </div>
   )

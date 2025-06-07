@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useCreateDocument } from '@/server-state/mutations/useCreateDocument'
 import { DocumentSchema } from '@/validations/document'
+import { CloudUpload, LoaderCircle, X } from 'lucide-react'
 import { useState } from 'react'
-import { CloudUpload, X, LoaderCircle } from 'lucide-react'
 
 function getFileType(file: File): 'pdf' | 'text' | 'web' | null {
   const ext = file.name.split('.').pop()?.toLowerCase()
