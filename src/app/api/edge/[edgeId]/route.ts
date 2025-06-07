@@ -45,7 +45,10 @@ export async function PATCH(req: NextRequest, context: Context) {
   }
   const edge = await prisma.edge.update({
     where: { id: edgeId },
-    data: parsed.data,
+    data: {
+      ...parsed.data,
+      ...(parsed.data.documentId ? { documentId: parsed.data.documentId } : {}),
+    },
   })
   return NextResponse.json({ edge })
 }

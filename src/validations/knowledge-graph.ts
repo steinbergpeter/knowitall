@@ -8,6 +8,7 @@ export const NodeSchema = z.object({
   metadata: z.record(z.any()).optional(),
   researchQueryId: z.string().optional(),
   provenance: z.string().optional(),
+  documentId: z.string().optional(),
 })
 export type Node = z.infer<typeof NodeSchema>
 
@@ -20,6 +21,7 @@ export const EdgeSchema = z.object({
   metadata: z.record(z.any()).optional(),
   researchQueryId: z.string().optional(),
   provenance: z.string().optional(),
+  documentId: z.string().optional(),
 })
 export type Edge = z.infer<typeof EdgeSchema>
 
@@ -28,6 +30,7 @@ export const SummarySchema = z.object({
   text: z.string().trim().min(1).max(1000),
   researchQueryId: z.string().optional(),
   provenance: z.string().optional(),
+  documentId: z.string().optional(),
 })
 export type Summary = z.infer<typeof SummarySchema>
 

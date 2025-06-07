@@ -19,6 +19,7 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   const summary = await prisma.summary.findUnique({
     where: { id: summaryId },
+    include: { document: true },
   })
   if (!summary) {
     return NextResponse.json({ error: 'Summary not found' }, { status: 404 })
@@ -45,7 +46,11 @@ export async function PATCH(req: NextRequest, context: Context) {
   }
   const summary = await prisma.summary.update({
     where: { id: summaryId },
-    data: parsed.data,
+    data: {
+      ...parsed.data,
+      ...(parsed.data.documentId ? { documentId: parsed.data.documentId } : {}),
+    },
+    include: { document: true },
   })
   return NextResponse.json({ summary })
 }

@@ -91,51 +91,57 @@ model Query {
 }
 
 model Node {
-  id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   label           String
   type            String
   metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  researchQuery   Query?   @relation(fields: [researchQueryId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  researchQuery   Query?    @relation(fields: [researchQueryId], references: [id])
   researchQueryId String?
+  document        Document? @relation(fields: [documentId], references: [id])
+  documentId      String?
   provenance      String? // e.g., source document, extraction method, etc.
 }
 
 model Edge {
-  id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   source          String // Node id
   target          String // Node id
   type            String
   metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  researchQuery   Query?   @relation(fields: [researchQueryId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  researchQuery   Query?    @relation(fields: [researchQueryId], references: [id])
   researchQueryId String?
+  document        Document? @relation(fields: [documentId], references: [id])
+  documentId      String?
   provenance      String? // e.g., source document, extraction method, etc.
 }
 
 model Summary {
-  id              String   @id @default(cuid())
-  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId       String
   text            String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  researchQuery   Query?   @relation(fields: [researchQueryId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  researchQuery   Query?    @relation(fields: [researchQueryId], references: [id])
   researchQueryId String?
+  document        Document? @relation(fields: [documentId], references: [id])
+  documentId      String?
   provenance      String? // e.g., source document, extraction method, etc.
 }
 
 model Document {
-  id            String   @id @default(cuid())
-  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId     String
-  user          User     @relation(fields: [userId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
   userId        String
   title         String
   type          String // e.g., 'pdf', 'web', 'text', etc.
@@ -143,6 +149,9 @@ model Document {
   content       String? // Raw text content
   extractedText String? // Extracted text from PDF or other sources for AI/graph
   metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  nodes         Node[]
+  edges         Edge[]
+  summaries     Summary[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

@@ -19,13 +19,14 @@ export async function POST(req: NextRequest) {
     )
   }
   // projectId is required by the model, researchQueryId is optional but must be undefined if not present
-  const { researchQueryId, ...rest } = parsed.data
+  const { researchQueryId, documentId, ...rest } = parsed.data
   const data = {
     ...rest,
     projectId: body.projectId,
     provenance: parsed.data.provenance,
     metadata: parsed.data.metadata,
     ...(researchQueryId ? { researchQueryId } : {}),
+    ...(documentId ? { documentId } : {}),
   }
   const node = await prisma.node.create({
     data,

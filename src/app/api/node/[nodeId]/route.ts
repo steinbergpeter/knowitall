@@ -45,7 +45,10 @@ export async function PATCH(req: NextRequest, context: Context) {
   }
   const node = await prisma.node.update({
     where: { id: nodeId },
-    data: parsed.data,
+    data: {
+      ...parsed.data,
+      ...(parsed.data.documentId ? { documentId: parsed.data.documentId } : {}),
+    },
   })
   return NextResponse.json({ node })
 }
