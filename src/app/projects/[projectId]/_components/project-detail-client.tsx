@@ -107,13 +107,13 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
               variant="secondary"
               className="mb-4"
             >
-              Reset Password
+              {isPublic ? 'Set Password & Make Private' : 'Reset Password'}
             </Button>
             <PasswordModal
               showModal={showPasswordModal}
               setShowModal={setShowPasswordModal}
               onPasswordReset={handlePasswordReset}
-              isPublic={isPublic}
+              currentPassword={isPublic ? null : 'set'} // just to indicate private/public
             />
             {/* Project Delete Trigger */}
             <Button
