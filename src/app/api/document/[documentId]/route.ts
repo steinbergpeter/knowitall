@@ -28,3 +28,38 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   return NextResponse.json({ document })
 }
+
+export async function DELETE(req: NextRequest, context: Context) {
+  const { documentId } = await context.params
+  const session = await getServerSession(authOptions)
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!documentId) {
+    return NextResponse.json({ error: 'Missing documentId' }, { status: 400 })
+  }
+  const document = await prisma.document.findUnique({
+    where: { id: documentId },
+    include: { project: true },
+  })
+  if (!document) {
+    return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+  }
+  // Only project owner can delete
+  if (document.project.ownerId !== session.user.id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  // Require password in body
+  const { password } = await req.json()
+  if (!password || !document.project.passwordHash) {
+    return NextResponse.json({ error: 'Password required' }, { status: 400 })
+  }
+  const valid = await import('@/lib/password').then((m) =>
+    m.verifyPassword(password, document.project.passwordHash!)
+  )
+  if (!valid) {
+    return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
+  }
+  await prisma.document.delete({ where: { id: documentId } })
+  return NextResponse.json({ success: true })
+}

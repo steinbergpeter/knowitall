@@ -1,6 +1,6 @@
-'use client'
-
-import { useState } from 'react'
+import PdfViewer from './pdf-viewer'
+import TextViewer from './text-viewer'
+import UrlViewer from './url-viewer'
 
 interface DocumentViewerClientProps {
   document: {
@@ -16,54 +16,18 @@ interface DocumentViewerClientProps {
 export default function DocumentViewerClient({
   document,
 }: DocumentViewerClientProps) {
-  const [viewMode, setViewMode] = useState<'pdf' | 'text'>('pdf')
   if (document.type === 'pdf' && (document.content || document.extractedText)) {
+    return <PdfViewer document={document} />
+  }
+  if (document.type === 'web' && (document.url || document.extractedText)) {
     return (
-      <div className="mb-4">
-        {/* <label className="block mb-2 font-medium">View mode:</label> */}
-        <select
-          className="border rounded px-2 py-1 mb-4"
-          value={viewMode}
-          onChange={(e) => setViewMode(e.target.value as 'pdf' | 'text')}
-        >
-          <option value="pdf">View as PDF</option>
-          <option value="text">View as Text</option>
-        </select>
-        {viewMode === 'pdf' && document.content && (
-          <>
-            <iframe
-              src={`data:application/pdf;base64,${document.content}`}
-              title="PDF Document"
-              width="100%"
-              height="600px"
-              className="border rounded"
-              allowFullScreen
-            />
-            <a
-              href={`data:application/pdf;base64,${document.content}`}
-              download={
-                document.title.endsWith('.pdf')
-                  ? document.title
-                  : `${document.title}.pdf`
-              }
-              className="mt-2 inline-block text-blue-600 underline text-sm"
-            >
-              Download PDF
-            </a>
-          </>
-        )}
-        {viewMode === 'text' && (
-          <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm overflow-x-auto">
-            {document.extractedText || 'No extracted text available.'}
-          </pre>
-        )}
-      </div>
+      <UrlViewer
+        url={document.url}
+        type={document.type}
+        extractedText={document.extractedText}
+      />
     )
   }
   // Fallback for non-PDFs or missing data
-  return (
-    <pre className="bg-gray-100 rounded p-4 whitespace-pre-wrap text-sm overflow-x-auto">
-      {document.content}
-    </pre>
-  )
+  return <TextViewer content={document.content} />
 }

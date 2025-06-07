@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 import PasswordModal from './password-modal'
 import ProjectDocumentsWrapperProps from './project-documents-wrapper'
+import ProjectBreadcrumbs from '@/components/project-breadcrumbs'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -66,6 +67,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
 
   return (
     <div className="w-full mx-auto rounded shadow p-12 pt-0 ">
+      <ProjectBreadcrumbs projectId={projectId} projectName={name} />
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">{name}</h1>
         <p className="text-gray-600 mb-2">{description}</p>
