@@ -28,6 +28,7 @@ export const ProjectCountsSchema = z.object({
   edges: z.number(),
   summaries: z.number(),
   documents: z.number(),
+  chats: z.number(),
 })
 
 export const ProjectDetailSchema = z.object({
@@ -56,6 +57,7 @@ type ProjectWithOwnerAndCounts = Project & {
     edges: number
     summaries: number
     documents: number
+    chats: number
   }
 }
 // Helper to transform a Prisma project (with owner and _count) to ProjectDetail
@@ -75,6 +77,7 @@ export function toProjectDetail(
       edges: project._count.edges,
       summaries: project._count.summaries,
       documents: project._count.documents,
+      chats: project._count.chats,
     },
     createdAt:
       project.createdAt instanceof Date

@@ -6,7 +6,12 @@ interface ProjectHeaderProps {
   description: string
   owner: { name?: string; email?: string } | null
   isPublic: boolean
-  counts: { documents: number; summaries: number; queries: number }
+  counts: {
+    documents: number
+    summaries: number
+    queries: number
+    chats: number
+  }
   activeTab: 'queries' | 'documents' | 'graph' | 'settings'
   setActiveTab: (tab: 'queries' | 'documents' | 'graph' | 'settings') => void
   children?: React.ReactNode
@@ -74,6 +79,9 @@ export default function ProjectHeader({
           </div>
           <div>
             <span className="font-semibold">Queries:</span> {counts.queries}
+          </div>
+          <div>
+            <span className="font-semibold">Chats:</span> {counts.chats}
           </div>
         </div>
       </div>

@@ -4,16 +4,18 @@ import type { ChatListItem, ChatWithQueries } from '@/validations/chat'
 // Abstracted queryFn for fetching all chats for a project
 export async function fetchChatList(
   projectId: string
-): Promise<{ chats: ChatListItem[] }> {
+): Promise<ChatListItem[]> {
   const res = await fetch(
     `/api/chat?projectId=${encodeURIComponent(projectId)}`
   )
   if (!res.ok) throw new Error('Failed to fetch chats')
-  return res.json()
+  const data = await res.json()
+  // Support both { chats: [...] } and [...] for backward compatibility
+  return Array.isArray(data) ? data : data.chats
 }
 
 export function useChatList(projectId: string, options = {}) {
-  return useQuery<{ chats: ChatListItem[] }>({
+  return useQuery<ChatListItem[]>({
     queryKey: ['chats', projectId],
     queryFn: () => fetchChatList(projectId),
     enabled: !!projectId,

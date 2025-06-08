@@ -26,6 +26,7 @@ export async function GET(_req: NextRequest, context: Context) {
           edges: true,
           summaries: true,
           documents: true,
+          chats: true,
         },
       },
     },

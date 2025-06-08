@@ -10,7 +10,7 @@ import ProjectDocumentsWrapperProps from './documents-tab/project-documents-wrap
 import PasswordModal from './modals/password-modal'
 import ProjectDeleteModal from './modals/project-delete-modal'
 import ProjectHeader from './project-header'
-import QueryPanel from './query-tab/query-panel'
+import QueryPanel from './query-tab'
 
 interface ProjectDetailClientProps {
   projectId: string

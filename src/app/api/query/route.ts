@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       const newChat = await prisma.chat.create({
         data: {
           projectId: input.projectId,
-          title: input.prompt.slice(0, 40) || 'New Chat',
+          title: input.prompt.slice(0, 40) || 'New Chat', // Use the user's query as the chat title
         },
       })
       chatId = newChat.id
@@ -54,8 +54,9 @@ export async function POST(req: NextRequest) {
     chat: { connect: { id: chatId } },
   }
 
+  let createdQuery
   try {
-    await prisma.query.create({ data })
+    createdQuery = await prisma.query.create({ data })
   } catch (err) {
     return NextResponse.json(
       { error: 'Failed to save query', details: (err as Error).message },
@@ -63,9 +64,15 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  // Simulate an AI response to the user's query
   const aiMessage = {
     role: 'ai',
     content: `This simulates a response to your query: "${input.prompt}"`,
+    context: {
+      userQuery: input.prompt,
+      chatId,
+      queryId: createdQuery.id,
+    },
   }
 
   const {
@@ -81,8 +88,17 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Return only the AI message (frontend expects AIMessageSchema)
-  return NextResponse.json(aiData)
+  // Return both the AI message and the user query as context
+  return NextResponse.json({
+    aiMessage: aiData,
+    userQuery: {
+      role: 'user',
+      content: input.prompt,
+      chatId,
+      queryId: createdQuery.id,
+    },
+    chatId,
+  })
 }
 
 // List all research queries for a project
