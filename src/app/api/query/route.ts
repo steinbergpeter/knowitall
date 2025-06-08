@@ -1,9 +1,9 @@
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { QuerySchema } from '@/validations/knowledge-graph'
-import { AIMessageSchema } from '@/validations/queries'
+import { QuerySchema, AIMessageSchema } from '@/validations/queries'
 import { getServerSession } from 'next-auth/next'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 
 // Create a research query
 export async function POST(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     success: inputOK,
     data: input,
     error: inputErr,
-  } = QuerySchema.safeParse(body)
+  } = QuerySchema.extend({ chatId: z.string().optional() }).safeParse(body)
 
   if (!inputOK) {
     return NextResponse.json(
@@ -28,9 +28,30 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  let chatId = input.chatId
+
+  // If no chatId, create a new chat first
+  if (!chatId) {
+    try {
+      const newChat = await prisma.chat.create({
+        data: {
+          projectId: input.projectId,
+          title: input.prompt.slice(0, 40) || 'New Chat',
+        },
+      })
+      chatId = newChat.id
+    } catch (err) {
+      return NextResponse.json(
+        { error: 'Failed to create chat', details: (err as Error).message },
+        { status: 500 }
+      )
+    }
+  }
+
   const data = {
     queryText: input.prompt,
     project: { connect: { id: input.projectId } },
+    chat: { connect: { id: chatId } },
   }
 
   try {

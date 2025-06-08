@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { useResearchMutation } from '@/server-state/mutations/useResearchMutation'
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import type { ChatMessage, ResearchQueryInput } from '@/validations/queries'
 
 interface QueryPanelProps {
@@ -50,10 +50,24 @@ export default function QueryPanel({ projectId }: QueryPanelProps) {
     submitQuery(queryData)
   }
 
+  const handleTextareaKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      ;(e.target as HTMLTextAreaElement).form?.dispatchEvent(
+        new Event('submit', { cancelable: true, bubbles: true })
+      )
+    }
+  }
+
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) =>
+    setQueryInput(e.target.value)
+
   return (
     <div className="mx-auto py-2 flex flex-col items-center gap-6 min-h-[70vh]">
       {/* CHAT HISTORY */}
-      <div className="w-full max-w-xl flex-1 flex flex-col gap-6 overflow-y-auto mb-4 border border-gray-300 rounded-lg bg-white shadow-sm p-4">
+      <div className="w-full max-w-xl flex-1 flex flex-col gap-6 mb-4 border border-gray-300 rounded-lg bg-white shadow-sm p-4 h-96 overflow-y-auto">
         {chatHistory.map((item, idx) => (
           <div
             key={idx}
@@ -88,8 +102,9 @@ export default function QueryPanel({ projectId }: QueryPanelProps) {
           className="w-full border rounded p-2 min-h-[80px] resize-vertical"
           placeholder="E.g. What are the main findings about X in this project?"
           value={queryInput}
-          onChange={(e) => setQueryInput(e.target.value)}
+          onChange={handleChange}
           required
+          onKeyDown={handleTextareaKeyDown}
         />
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmittingQuery}>

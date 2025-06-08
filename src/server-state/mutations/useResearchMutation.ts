@@ -6,11 +6,12 @@ import { useMutation } from '@tanstack/react-query'
 export async function submitResearchQuery({
   projectId,
   prompt,
-}: ResearchQueryInput): Promise<AIMessage> {
+  chatId,
+}: ResearchQueryInput): Promise<AIMessage & { chatId?: string }> {
   const res = await fetch('/api/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ projectId, prompt }),
+    body: JSON.stringify({ projectId, prompt, chatId }),
   })
   const data = await res.json()
 
@@ -26,7 +27,8 @@ export async function submitResearchQuery({
 
   aiData.content = content
 
-  return aiData
+  // If the backend returns a chatId, include it in the return value
+  return { ...aiData, chatId: data.chatId }
 }
 
 // React Query mutation hook

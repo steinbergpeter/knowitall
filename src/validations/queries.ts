@@ -24,6 +24,7 @@ export type ChatMessage = z.infer<typeof ChatMessageSchema>
 export const ResearchQuerySchema = z.object({
   projectId: z.string(),
   prompt: z.string(),
+  chatId: z.string().optional(),
 })
 
 export type ResearchQueryInput = z.infer<typeof ResearchQuerySchema>
@@ -49,3 +50,11 @@ export const KnowledgeGraphSchema = z.object({
 })
 
 export type KnowledgeGraphResult = z.infer<typeof KnowledgeGraphSchema>
+
+export const QuerySchema = z.object({
+  projectId: z.string(),
+  prompt: z.string(),
+  chatId: z.string().optional(),
+})
+
+export type QueryInput = z.infer<typeof QuerySchema>
