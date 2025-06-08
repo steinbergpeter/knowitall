@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ProjectCreateForm } from '@/app/projects/_components/project-create-form'
-import { useProjects } from '@/server-state/queries/useProjects'
+import { useProjects } from '@/server-state/queries_legacy/useProjects'
 import ProjectInList from '@/app/projects/_components/project-in-list'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

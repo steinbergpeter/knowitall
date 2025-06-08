@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import DeleteDocumentModal from './document-delete-modal'
 import { Trash2 } from 'lucide-react'
-import { useDeleteDocument } from '@/server-state/mutations/useDeleteDocument'
+import { useDeleteDocument } from '@/server-state/mutations_legacy/useDeleteDocument'
 import { Button } from '@/components/ui/button'
 
 interface DocumentDeleteTriggerProps {

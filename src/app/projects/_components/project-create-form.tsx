@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useCreateProject } from '@/server-state/mutations/useCreateProject'
+import { useCreateProject } from '@/server-state/mutations_legacy/useCreateProject'
 import { type CreatedProject } from '@/validations/project'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'

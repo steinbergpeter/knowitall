@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { useDeleteProject } from '@/server-state/mutations/useDeleteProject'
-import { useProjectDetail } from '@/server-state/queries/useProjectDetail'
+import { useProjectDetail } from '@/server-state/queries_legacy/useProjectDetail'
 import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
