@@ -42,7 +42,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   }
 
   // Fix: Make handleDeleteProject async to match modal's expected signature
-  async function handleDeleteProject(password: string, projectName: string) {
+  const handleDeleteProject = async (password: string, projectName: string) => {
     await new Promise<void>((resolve, reject) => {
       deleteProject(
         { projectId, password, projectName },

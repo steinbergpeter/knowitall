@@ -1,4 +1,25 @@
+// src/validations/queries.ts
 import { z } from 'zod'
+
+export const UserMessageSchema = z.object({
+  role: z.literal('user'),
+  content: z.string(),
+  error: z.string().optional(),
+})
+
+export type UserMessage = z.infer<typeof UserMessageSchema>
+
+export const AIMessageSchema = z.object({
+  role: z.literal('ai'),
+  content: z.string(),
+  error: z.string().optional(),
+})
+
+export type AIMessage = z.infer<typeof AIMessageSchema>
+
+export const ChatMessageSchema = z.union([UserMessageSchema, AIMessageSchema])
+
+export type ChatMessage = z.infer<typeof ChatMessageSchema>
 
 export const ResearchQuerySchema = z.object({
   projectId: z.string(),

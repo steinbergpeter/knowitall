@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { useResearchMutation } from '@/server-state/mutations/useResearchMutation'
 import { useState } from 'react'
+import type { ChatMessage, ResearchQueryInput } from '@/validations/queries'
 
 interface QueryPanelProps {
   projectId: string
@@ -10,40 +11,28 @@ interface QueryPanelProps {
 
 export default function QueryPanel({ projectId }: QueryPanelProps) {
   const [queryInput, setQueryInput] = useState('')
-  const [chatHistory, setChatHistory] = useState<
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
-      query: string | null
-      aiResponse: string | null
-      error?: string
-    }[]
-  >([
-    {
-      query: null,
-      aiResponse:
+      role: 'ai',
+      content:
         '👋 Welcome! This is your project research assistant. Ask any research question about your project, and I’ll answer or help you explore your knowledge graph. Try: "What are the main findings about X?" or "Summarize the key documents."',
     },
   ])
   const { mutate: submitQuery, isPending: isSubmittingQuery } =
     useResearchMutation({
-      onSuccess: (
-        data: { aiResponse: string },
-        variables: { projectId: string; query: string }
-      ) => {
+      onSuccess: (data: import('@/validations/queries').AIMessage) => {
         setChatHistory((prev) => [
           ...prev,
-          { query: variables.query, aiResponse: data.aiResponse },
+          { role: data.role, content: data.content },
         ])
         setQueryInput('')
       },
-      onError: (
-        error: unknown,
-        variables: { projectId: string; query: string }
-      ) => {
+      onError: (error: unknown) => {
         setChatHistory((prev) => [
           ...prev,
           {
-            query: variables.query,
-            aiResponse: null,
+            role: 'ai',
+            content: '',
             error: error instanceof Error ? error.message : 'Unknown error',
           },
         ])
@@ -52,7 +41,13 @@ export default function QueryPanel({ projectId }: QueryPanelProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    submitQuery({ projectId, prompt: queryInput })
+    const userMessage: ChatMessage = { role: 'user', content: queryInput }
+    setChatHistory((prev) => [...prev, userMessage])
+    const queryData: ResearchQueryInput = {
+      projectId,
+      prompt: queryInput,
+    }
+    submitQuery(queryData)
   }
 
   return (
@@ -64,23 +59,18 @@ export default function QueryPanel({ projectId }: QueryPanelProps) {
             key={idx}
             className="p-4 bg-gray-50 border border-gray-200 rounded-xl"
           >
-            {item.query === null ? (
-              <div className="text-gray-600 italic">{item.aiResponse}</div>
-            ) : (
-              <>
-                <div className="mb-2">
-                  <span className="font-semibold text-blue-700">You:</span>{' '}
-                  {item.query}
-                </div>
+            {item.role === 'ai' ? (
+              <div className="text-green-700">
+                <span className="font-semibold">AI:</span> {item.content}
                 {item.error && (
                   <div className="text-red-500">Error: {item.error}</div>
                 )}
-                {item.aiResponse && (
-                  <div className="text-green-700">
-                    <span className="font-semibold">AI:</span> {item.aiResponse}
-                  </div>
-                )}
-              </>
+              </div>
+            ) : (
+              <div className="mb-2">
+                <span className="font-semibold text-blue-700">You:</span>{' '}
+                {item.content}
+              </div>
             )}
           </div>
         ))}

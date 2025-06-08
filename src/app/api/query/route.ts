@@ -1,41 +1,67 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { QuerySchema } from '@/validations/knowledge-graph'
+import { AIMessageSchema } from '@/validations/queries'
+import { getServerSession } from 'next-auth/next'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Create a research query
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
+
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   const body = await req.json()
-  const parsed = QuerySchema.safeParse(body)
-  if (!parsed.success) {
+
+  const {
+    success: inputOK,
+    data: input,
+    error: inputErr,
+  } = QuerySchema.safeParse(body)
+
+  if (!inputOK) {
     return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error },
+      { error: 'Invalid input', details: inputErr },
       { status: 400 }
     )
   }
-  // Prisma expects queryText and a project relation
+
   const data = {
-    queryText: parsed.data.query,
-    project: { connect: { id: body.projectId } },
-    // Optionally add documents if you have a relation
+    queryText: input.prompt,
+    project: { connect: { id: input.projectId } },
   }
-  const query = await prisma.query.create({
-    data,
-  })
 
-  // Simulate AI response (replace with real AI call as needed)
-  const aiResponse = `AI: This is a response to your query: "${parsed.data.query}"`
+  try {
+    await prisma.query.create({ data })
+  } catch (err) {
+    return NextResponse.json(
+      { error: 'Failed to save query', details: (err as Error).message },
+      { status: 500 }
+    )
+  }
 
-  // Return only the query and aiResponse (no knowledge graph, nodes, edges, summaries)
-  return NextResponse.json({
-    query,
-    aiResponse,
-  })
+  const aiMessage = {
+    role: 'ai',
+    content: `This simulates a response to your query: "${input.prompt}"`,
+  }
+
+  const {
+    success: aiOk,
+    data: aiData,
+    error: aiErr,
+  } = AIMessageSchema.safeParse(aiMessage)
+
+  if (!aiOk) {
+    return NextResponse.json(
+      { error: 'AI response validation failed', details: aiErr },
+      { status: 500 }
+    )
+  }
+
+  // Return only the AI message (frontend expects AIMessageSchema)
+  return NextResponse.json(aiData)
 }
 
 // List all research queries for a project

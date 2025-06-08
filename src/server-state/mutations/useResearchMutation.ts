@@ -1,30 +1,37 @@
+import type { AIMessage, ResearchQueryInput } from '@/validations/queries'
+import { AIMessageSchema } from '@/validations/queries'
 import { useMutation } from '@tanstack/react-query'
 
 // Standalone mutationFn for submitting a research query
 export async function submitResearchQuery({
   projectId,
   prompt,
-}: {
-  projectId: string
-  prompt: string
-}) {
-  const res = await fetch('/api/research/query', {
+}: ResearchQueryInput): Promise<AIMessage> {
+  const res = await fetch('/api/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ projectId, prompt }),
   })
+  const data = await res.json()
+
   if (!res.ok) {
-    const data = await res.json()
     throw new Error(data.error || 'Failed to submit research query')
   }
-  const data = await res.json()
-  // Optionally validate data shape here
-  return data
+  const { success, data: aiData, error } = AIMessageSchema.safeParse(data)
+  if (!success) {
+    throw new Error(`Invalid response format: ${error.message}`)
+  }
+
+  const content = `This simulates a response to your query: "${prompt}"`
+
+  aiData.content = content
+
+  return aiData
 }
 
 // React Query mutation hook
 export function useResearchMutation(options = {}) {
-  return useMutation({
+  return useMutation<AIMessage, Error, ResearchQueryInput>({
     mutationFn: submitResearchQuery,
     ...options,
   })
