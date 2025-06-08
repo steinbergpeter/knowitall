@@ -4,8 +4,18 @@ import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { ChatSchema } from '@/validations/chat'
 
+// GET: List chats for a project
+// POST: Create chat (with generic title)
+export async function GET() {
+  return new Response('Not implemented', { status: 501 })
+}
+
+export async function POST() {
+  return new Response('Not implemented', { status: 501 })
+}
+
 // Create a new chat
-export async function POST(req: NextRequest) {
+export async function createChat(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -35,7 +45,7 @@ export async function POST(req: NextRequest) {
 }
 
 // List all chats for a project
-export async function GET(req: NextRequest) {
+export async function listChats(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
