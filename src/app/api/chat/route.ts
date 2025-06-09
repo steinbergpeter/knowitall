@@ -2,26 +2,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { ChatSchema } from '@/validations/chat'
+import { ChatInputSchema } from '@/validations/chat'
 
-// GET: List chats for a project
-// POST: Create chat (with generic title)
-export async function GET() {
-  return new Response('Not implemented', { status: 501 })
-}
-
-export async function POST() {
-  return new Response('Not implemented', { status: 501 })
+// List all chats for a project
+export async function GET(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const { searchParams } = new URL(req.url)
+  const projectId = searchParams.get('projectId')
+  if (!projectId) {
+    return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
+  }
+  const chats = await prisma.chat.findMany({
+    where: { projectId },
+    orderBy: { createdAt: 'desc' },
+  })
+  return NextResponse.json({ chats })
 }
 
 // Create a new chat
-export async function createChat(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const body = await req.json()
-  const { success, data, error } = ChatSchema.safeParse(body)
+  const { success, data, error } = ChatInputSchema.safeParse(body)
   if (!success) {
     return NextResponse.json(
       { error: 'Invalid input', details: error },
@@ -42,22 +50,4 @@ export async function createChat(req: NextRequest) {
       { status: 500 }
     )
   }
-}
-
-// List all chats for a project
-export async function listChats(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session || !session.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const { searchParams } = new URL(req.url)
-  const projectId = searchParams.get('projectId')
-  if (!projectId) {
-    return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
-  }
-  const chats = await prisma.chat.findMany({
-    where: { projectId },
-    orderBy: { createdAt: 'desc' },
-  })
-  return NextResponse.json({ chats })
 }

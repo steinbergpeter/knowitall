@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import type { ChatListItem, ChatWithQueries } from '@/validations/chat'
-
+import type { ChatListItem } from '@/validations/chat'
+import type { ChatWithMessages } from '@/validations/message'
 // Abstracted queryFn for fetching all chats for a project
 export async function fetchChatList(
   projectId: string
@@ -24,14 +24,14 @@ export function useChatList(projectId: string, options = {}) {
 }
 
 // Abstracted queryFn for fetching a single chat and its queries
-export async function fetchChat(chatId: string): Promise<ChatWithQueries> {
+export async function fetchChat(chatId: string): Promise<ChatWithMessages> {
   const res = await fetch(`/api/chat/${chatId}`)
   if (!res.ok) throw new Error('Failed to fetch chat')
   return res.json()
 }
 
 export function useChat(chatId: string, options = {}) {
-  return useQuery<ChatWithQueries>({
+  return useQuery<ChatWithMessages>({
     queryKey: ['chat', chatId],
     queryFn: () => fetchChat(chatId),
     enabled: !!chatId,

@@ -18,7 +18,7 @@ export async function GET(_req: NextRequest, context: Context) {
   }
   const chat = await prisma.chat.findUnique({
     where: { id: chatId },
-    include: { queries: { orderBy: { createdAt: 'asc' } } },
+    include: { messages: { orderBy: { createdAt: 'asc' } } },
   })
   if (!chat) {
     return NextResponse.json({ error: 'Chat not found' }, { status: 404 })

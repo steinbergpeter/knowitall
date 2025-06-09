@@ -1,6 +1,6 @@
 'use client'
 
-import { useChatList } from '@/server-state/queries/useChatQueries'
+import { useChatList } from '@/server-state/chats/useChatQueries'
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import {
@@ -13,7 +13,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog'
-import { useDeleteChat } from '@/server-state/mutations/useChatMutations'
+import { useDeleteChat } from '@/server-state/chats/useChatMutations'
 import { useQueryClient } from '@tanstack/react-query'
 
 interface ChatListProps {

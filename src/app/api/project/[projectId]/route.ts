@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, context: Context) {
       owner: true,
       _count: {
         select: {
-          queries: true,
+          messages: true,
           nodes: true,
           edges: true,
           summaries: true,
@@ -51,8 +51,23 @@ export async function GET(_req: NextRequest, context: Context) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
-  // Return project detail in correct shape
-  const projectDetail = toProjectDetail(project)
+  // Transform to API shape
+  const projectDetail = toProjectDetail({
+    ...project,
+    owner: {
+      id: project.owner.id,
+      name: project.owner.name,
+      email: project.owner.email,
+    },
+    _count: {
+      messages: project._count.messages,
+      nodes: project._count.nodes,
+      edges: project._count.edges,
+      summaries: project._count.summaries,
+      documents: project._count.documents,
+      chats: project._count.chats,
+    },
+  })
   return NextResponse.json({ project: projectDetail })
 }
 

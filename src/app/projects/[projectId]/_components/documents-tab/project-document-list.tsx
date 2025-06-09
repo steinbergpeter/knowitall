@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useDocuments } from '@/server-state/queries_legacy/useDocuments'
+import { useDocuments } from '@/server-state/documents/useDocumentsQueries'
 
 function ProjectDocumentList({ projectId }: { projectId: string }) {
   const { data: documents, isLoading, error } = useDocuments(projectId)

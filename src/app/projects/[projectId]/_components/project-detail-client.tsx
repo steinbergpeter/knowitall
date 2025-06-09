@@ -1,8 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { useDeleteProject } from '@/server-state/mutations/useDeleteProject'
-import { useProjectDetail } from '@/server-state/queries_legacy/useProjectDetail'
+import { useDeleteProject } from '@/server-state/projects/useProjectsMutations'
+import { useProjectDetail } from '@/server-state/projects/useProjectsQueries'
 import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'

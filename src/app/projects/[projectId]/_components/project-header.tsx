@@ -9,7 +9,7 @@ interface ProjectHeaderProps {
   counts: {
     documents: number
     summaries: number
-    queries: number
+    messages: number
     chats: number
   }
   activeTab: 'queries' | 'documents' | 'graph' | 'settings'
@@ -78,7 +78,7 @@ export default function ProjectHeader({
             <span className="font-semibold">Summaries:</span> {counts.summaries}
           </div>
           <div>
-            <span className="font-semibold">Queries:</span> {counts.queries}
+            <span className="font-semibold">Queries:</span> {counts.messages}
           </div>
           <div>
             <span className="font-semibold">Chats:</span> {counts.chats}

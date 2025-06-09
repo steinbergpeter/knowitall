@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useCreateDocument } from '@/server-state/mutations_legacy/useCreateDocument'
+import { useCreateDocument } from '@/server-state/documents/useDocumentsMutations'
 import { DocumentSchema } from '@/validations/document'
 import { CloudUpload, LoaderCircle, X } from 'lucide-react'
 import { useState } from 'react'

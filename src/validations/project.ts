@@ -23,7 +23,7 @@ export const CreatedProjectSchema = z.object({
 export type CreatedProject = z.infer<typeof CreatedProjectSchema>
 
 export const ProjectCountsSchema = z.object({
-  queries: z.number(),
+  messages: z.number(),
   nodes: z.number(),
   edges: z.number(),
   summaries: z.number(),
@@ -52,7 +52,7 @@ export type ProjectDetail = z.infer<typeof ProjectDetailSchema>
 type ProjectWithOwnerAndCounts = Project & {
   owner: Pick<User, 'id' | 'name' | 'email'>
   _count: {
-    queries: number
+    messages: number
     nodes: number
     edges: number
     summaries: number
@@ -72,7 +72,7 @@ export function toProjectDetail(
       email: project.owner.email,
     },
     counts: {
-      queries: project._count.queries,
+      messages: project._count.messages,
       nodes: project._count.nodes,
       edges: project._count.edges,
       summaries: project._count.summaries,
