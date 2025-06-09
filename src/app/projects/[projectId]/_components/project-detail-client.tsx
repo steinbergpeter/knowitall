@@ -6,11 +6,12 @@ import { useProjectDetail } from '@/server-state/projects/useProjectsQueries'
 import { Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useState } from 'react'
-import ProjectDocumentsWrapperProps from './documents-tab/project-documents-wrapper'
-import PasswordModal from './modals/password-modal'
-import ProjectDeleteModal from './modals/project-delete-modal'
+import ProjectDocumentsWrapperProps from './documents-tab'
+import PasswordModal from './settings-tab/password-modal'
+import ProjectDeleteModal from './settings-tab/project-delete-modal'
 import ProjectHeader from './project-header'
 import QueryPanel from './query-tab'
+import type { Tabs } from './types'
 
 interface ProjectDetailClientProps {
   projectId: string
@@ -21,9 +22,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   const { data: session } = useSession()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [activeTab, setActiveTab] = useState<
-    'queries' | 'documents' | 'graph' | 'settings'
-  >('queries')
+  const [activeTab, setActiveTab] = useState<Tabs>('queries')
   const onSuccess = () => (window.location.href = '/projects')
   const { mutate: deleteProject, isPending: isDeletingProject } =
     useDeleteProject(onSuccess)
@@ -63,6 +62,7 @@ function ProjectDetailClient({ projectId }: ProjectDetailClientProps) {
   if (!data) {
     return <div className="mt-8 text-gray-500">Project not found.</div>
   }
+
   const {
     project: { counts, name, description, owner, isPublic },
   } = data

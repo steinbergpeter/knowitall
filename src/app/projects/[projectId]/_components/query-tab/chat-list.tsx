@@ -15,17 +15,22 @@ import {
 } from '@/components/ui/dialog'
 import { useDeleteChat } from '@/server-state/chats/useChatMutations'
 import { useQueryClient } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
 
 interface ChatListProps {
   projectId: string
   selectedChatId: string | null
   onSelectChat: (chatId: string | null) => void
+  onNewChat: () => void
+  isCreatingChat?: boolean
 }
 
 export default function ChatList({
   projectId,
   selectedChatId,
   onSelectChat,
+  onNewChat,
+  isCreatingChat,
 }: ChatListProps) {
   const { data: chats, isLoading, isError } = useChatList(projectId)
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
@@ -55,8 +60,15 @@ export default function ChatList({
     return <div className="p-4">No chats yet.</div>
 
   return (
-    <div className="flex flex-col w-64 min-w-[12rem] max-w-xs h-[40rem] ml-4">
-      <div className="font-semibold text-lg mb-2 px-2">Previous Chats</div>
+    <div className="flex flex-col w-80 min-w-[12rem] max-w-xs h-[40rem] ml-4">
+      {/* HEADING */}
+      <div className="flex items-center justify-between mb-2 px-2">
+        <span className="font-semibold text-lg">Previous Chats</span>
+        <Button onClick={onNewChat} disabled={isCreatingChat} type="button">
+          {isCreatingChat ? 'Creating...' : 'New Chat'}
+        </Button>
+      </div>
+      {/* LIST */}
       <div className="flex flex-col gap-1 overflow-y-auto">
         {chats.map((chat: { id: string; title: string }) => (
           <div
@@ -112,13 +124,13 @@ export default function ChatList({
                       Cancel
                     </button>
                   </DialogClose>
-                  <button
+                  <Button
                     className="px-4 py-2 rounded bg-destructive text-white hover:bg-destructive/90"
                     onClick={() => deleteChat(chat.id)}
                     disabled={isDeleting}
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
-                  </button>
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
