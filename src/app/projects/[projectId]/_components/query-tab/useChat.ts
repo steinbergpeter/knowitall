@@ -22,6 +22,14 @@ import {
   type KeyboardEvent,
 } from 'react'
 
+// Move WebLinkChecklistItem to a top-level export so it can be imported elsewhere
+export interface WebLinkChecklistItem {
+  id: string
+  url: string
+  title: string
+  summary: string
+}
+
 export function useChat(projectId: string) {
   const [queryInput, setQueryInput] = useState('')
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
@@ -165,6 +173,52 @@ export function useChat(projectId: string) {
     }
   }, [chatData, optimisticMessages])
 
+  // State for web search approval workflow
+  const [pendingWebLinks, setPendingWebLinks] = useState<
+    WebLinkChecklistItem[]
+  >([])
+  const [awaitingUserApproval, setAwaitingUserApproval] = useState(false)
+
+  // When a new assistant message arrives, check for web search approval
+  useEffect(() => {
+    if (chatData && chatData.messages.length > 0) {
+      const lastMsg = chatData.messages[
+        chatData.messages.length - 1
+      ] as Message & {
+        webLinks?: WebLinkChecklistItem[]
+        awaitingUserApproval?: boolean
+      }
+      // If the last message is from the assistant and contains webLinks for approval
+      if (
+        lastMsg.author === 'assistant' &&
+        lastMsg.webLinks &&
+        Array.isArray(lastMsg.webLinks) &&
+        lastMsg.awaitingUserApproval
+      ) {
+        setPendingWebLinks(lastMsg.webLinks)
+        setAwaitingUserApproval(true)
+      } else {
+        setPendingWebLinks([])
+        setAwaitingUserApproval(false)
+      }
+    }
+  }, [chatData])
+
+  // Handler for user approval of web links
+  const handleApproveWebLinks = (approvedIds: string[]) => {
+    if (!selectedChatId || !approvedIds.length) return
+    // Send a message to the backend with the approved IDs (could be a special message type or command)
+    const approvalMessage: MessageInput = {
+      projectId,
+      chatId: selectedChatId,
+      author: 'user',
+      content: `/approve-web-links ${approvedIds.join(',')}`,
+    }
+    createMessage(approvalMessage)
+    setPendingWebLinks([])
+    setAwaitingUserApproval(false)
+  }
+
   // CHAT Handlers
   const handleSelectChat = (chatId: string | null) => {
     setSelectedChatId(chatId)
@@ -243,10 +297,13 @@ export function useChat(projectId: string) {
     chatListData,
     chatData,
     chatHistory,
+    pendingWebLinks,
+    awaitingUserApproval,
     handleMessageSubmit,
     handleMessageKeyDown,
     handleMessageChange,
     handleNewChat,
     handleSelectChat,
+    handleApproveWebLinks,
   }
 }

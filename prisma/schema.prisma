@@ -111,9 +111,16 @@ model Node {
   label      String
   type       String
   metadata   Json?
+  positionX  Float    @default(0.0)
+  positionY  Float    @default(0.0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  provenance String? // e.g., source document, extraction method, etc.
+  provenance String?
+
+  // Self-relation for parent/child nodes
+  parentNode   Node?   @relation("NodeToNode", fields: [parentNodeId], references: [id])
+  parentNodeId String?
+  childNodes   Node[]  @relation("NodeToNode")
 }
 
 model Edge {

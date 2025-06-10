@@ -1,5 +1,20 @@
-import { useRef, useEffect } from 'react'
 import type { Message } from '@/validations/message'
+import type { AnchorHTMLAttributes } from 'react'
+import { useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+
+function MarkdownLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  return (
+    <a
+      {...props}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 underline"
+    >
+      {props.children}
+    </a>
+  )
+}
 
 export default function ChatHistory({
   chatHistory,
@@ -29,7 +44,14 @@ export default function ChatHistory({
         >
           {item.author === 'assistant' ? (
             <div className="text-green-700">
-              <span className="font-semibold">AI:</span> {item.content}
+              <span className="font-semibold">AI:</span>{' '}
+              <ReactMarkdown
+                components={{
+                  a: MarkdownLink,
+                }}
+              >
+                {item.content}
+              </ReactMarkdown>
             </div>
           ) : (
             <div className="mb-2">

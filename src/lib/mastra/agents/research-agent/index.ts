@@ -1,18 +1,20 @@
 import { GraphSchema, type Graph } from '@/validations/research'
-import type { WebSearchOutput } from '@/validations/web' // Removed TavilySearchResult
 import { openai } from '@ai-sdk/openai'
 import { Agent } from '@mastra/core/agent'
+import { graphQueryTool } from '../../tools/graph-query'
 import { webSearchTool } from '../../tools/web-search'
+import { agentPrompt } from './agent-prompt'
 import { extractAndValidateGraph } from './extract-and-validate-graph'
+import { extractWebSearchResults } from './extract-web-search-results'
+import { formatWebLinksForChecklist } from './format-web-links-for-checklist'
 import { persistGraph } from './persist-graph'
 import { processWebSearchResults } from './process-web-search-results'
-import { graphQueryTool } from '../../tools/graph-query'
 
 const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
 
 export const researchAgent = new Agent({
   name: 'ResearchAgent',
-  instructions: `You are a research assistant. The current date and time is: ${now}. Analyze user queries and provide structured, helpful responses. If relevant, extract entities, relationships, and summary points. You have access to a web search tool for up-to-date information.\n\nWhen possible, return your answer as a JSON object matching this TypeScript type:\n\ninterface Graph { nodes: Node[]; edges: Edge[]; summaries: Summary[] }\ninterface Node { id?: string; label: string; type: string; metadata?: Record<string, any>; provenance?: string; documentId?: string }\ninterface Edge { id?: string; source: string; target: string; type: string; metadata?: Record<string, any>; provenance?: string; documentId?: string }\ninterface Summary { id?: string; text: string; provenance?: string; documentId?: string }\n\nIf you cannot extract a graph, return { nodes: [], edges: [], summaries: [] } as JSON.`,
+  instructions: agentPrompt(now),
   model: openai('gpt-4o'),
   tools: { webSearch: webSearchTool, graphQuery: graphQueryTool },
 })
@@ -20,32 +22,63 @@ export const researchAgent = new Agent({
 // Main workflow: accepts chat history, returns AI response and structured data
 export async function runResearchAgent(
   messages: { role: 'user' | 'assistant'; content: string }[],
-  options?: { projectId?: string; documentId?: string; userId?: string } // Added userId to options
+  options?: {
+    projectId?: string
+    documentId?: string
+    userId?: string
+    documentContext?: Record<string, unknown> // Optional document metadata/context
+  }
 ) {
-  // 1. Analyze the query (intent, entities, keywords, output format)
-  // 2. Orchestrate a web search (tool is available to the agent)
-  const aiResult = await researchAgent.generate(messages)
+  // If documentContext is provided, prepend it to the user message for richer extraction
+  let enrichedMessages = messages
+  if (options?.documentContext && messages.length > 0) {
+    const docMetaString =
+      'Document context (metadata): ' +
+      JSON.stringify(options.documentContext) +
+      '\n\n'
+    enrichedMessages = [
+      {
+        role: 'user',
+        content: docMetaString + messages[0].content,
+      },
+      ...messages.slice(1),
+    ]
+  }
+
+  const aiResult = await researchAgent.generate(enrichedMessages)
   const aiText = aiResult.text || ''
 
-  // Process Web Search Tool Results
-  const webSearchResults: WebSearchOutput[] = []
-  // Correctly access tool results.
-  // Assuming aiResult has a 'toolResults' property based on common patterns.
-  // If Mastra Agent provides results differently, this will need adjustment.
-  if (aiResult.toolResults && Array.isArray(aiResult.toolResults)) {
-    for (const toolResult of aiResult.toolResults) {
-      if (toolResult.toolName === 'web-search' && toolResult.result) {
-        // Ensure the result conforms to WebSearchOutput before pushing
-        // This assumes webSearchTool.execute correctly returns WebSearchOutput
-        // or throws an error if validation fails within the tool.
-        webSearchResults.push(toolResult.result as WebSearchOutput)
-      }
+  // Use helper to extract web search results
+  const webSearchResults = extractWebSearchResults(
+    aiResult as unknown as Record<string, unknown>
+  )
+
+  // If web search results exist, return them to the user for approval instead of auto-saving
+  if (webSearchResults.length > 0) {
+    // Use helper to format for checklist UI
+    const webLinks = formatWebLinksForChecklist(webSearchResults)
+    // Format recommendations as markdown links, each on a new line, with only the link clickable
+    const recommendations = webLinks
+      .map(
+        (link) =>
+          `- [${link.title || link.url}](${link.url})${link.summary ? ' — ' + link.summary : ''}`
+      )
+      .join('\n')
+    return {
+      text:
+        'Here are some websites where you can learn more online:\n\n' +
+        recommendations +
+        '\n\nPlease select which you want to add to your knowledge graph.',
+      webLinks, // structured for checklist UI
+      awaitingUserApproval: true,
     }
   }
 
   let graph: Graph = { nodes: [], edges: [], summaries: [] }
   let validated: ReturnType<typeof GraphSchema.safeParse> | undefined
-  ;({ graph, validated } = extractAndValidateGraph(aiText, graph.summaries))
+  const extracted = extractAndValidateGraph(aiText, graph.summaries)
+  graph = extracted.graph
+  validated = extracted.validated
 
   if (webSearchResults.length > 0 && options?.projectId && options?.userId) {
     const { projectId, userId } = options
@@ -58,10 +91,24 @@ export async function runResearchAgent(
   }
 
   // 3. Try to extract nodes, edges, summaries from JSON in the AI output
-  ;({ graph, validated } = extractAndValidateGraph(aiText, graph.summaries))
+  const extracted2 = extractAndValidateGraph(aiText, graph.summaries)
+  graph = extracted2.graph
+  validated = extracted2.validated
 
-  // 5. Store results in PostgreSQL via Prisma if validated
-  if (validated?.success && options?.projectId) {
+  // If documentId is provided, tag all graph elements with it
+  if (options?.documentId) {
+    for (const node of graph.nodes) node.documentId = options.documentId
+    for (const edge of graph.edges) edge.documentId = options.documentId
+    for (const summary of graph.summaries)
+      summary.documentId = options.documentId
+  }
+
+  // Store results in PostgreSQL via Prisma if validated or if any graph data exists
+  const hasGraphData =
+    graph.nodes.length > 0 ||
+    graph.edges.length > 0 ||
+    graph.summaries.length > 0
+  if ((validated?.success || hasGraphData) && options?.projectId) {
     const { projectId } = options
     await persistGraph(graph, projectId)
   }
@@ -70,6 +117,6 @@ export async function runResearchAgent(
     text: aiText,
     graph,
     validated,
-    webSearchResults, // Optionally return the raw web search results too
+    webSearchResults,
   }
 }

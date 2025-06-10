@@ -7,6 +7,10 @@ export const NodeSchema = z.object({
   metadata: z.record(z.any()).optional(), // Prisma: Json? (null or object) → Zod: object | undefined
   provenance: z.string().optional(), // Prisma: String? (null or string) → Zod: string | undefined
   documentId: z.string().optional(), // Prisma: String? (null or string) → Zod: string | undefined
+  positionX: z.number().optional(), // Optional X position for the node
+  positionY: z.number().optional(), // Optional Y position for the node
+  parentNodeId: z.string().optional(), // Optional parent node ID for hierarchical structures
+  childNodes: z.array(z.string()).optional(), // Array of child node IDs (optional for frontend convenience)
 })
 
 export const EdgeSchema = z.object({

@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, KeyboardEvent, FormEvent } from 'react'
 
 interface QueryInputFormProps {
   queryInput: string
   isSubmitting: boolean
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
-  onSubmit: (e: React.FormEvent) => void
+  onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void
+  onSubmit: (e: FormEvent) => void
 }
 
 export default function QueryInputForm({

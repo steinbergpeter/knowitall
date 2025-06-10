@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "Falkland_Islands",
+      "label": "Falkland Islands",
+      "type": "Location",
+      "metadata": {
+        "otherNames": ["Islas Malvinas"],
+        "location": "South Atlantic Ocean",
+        "sovereignty": "British Overseas Territory"
+      },
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "id": "United_Kingdom",
+      "label": "United Kingdom",
+      "type": "Country",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "id": "Argentina",
+      "label": "Argentina",
+      "type": "Country",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "id": "Falklands_War",
+      "label": "Falklands War",
+      "type": "Event",
+      "metadata": {
+        "startDate": "1982-04-02",
+        "endDate": "1982-06-14"
+      },
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "id": "Port_Stanley",
+      "label": "Port Stanley",
+      "type": "Location",
+      "metadata": {
+        "capital": true
+      },
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "id": "RAF_Mount_Pleasant",
+      "label": "RAF Mount Pleasant",
+      "type": "Military Base",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    }
+  ],
+  "edges": [
+    {
+      "source": "Falkland_Islands",
+      "target": "United_Kingdom",
+      "type": "sovereignty",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "Falkland_Islands",
+      "target": "Argentina",
+      "type": "sovereignty_dispute",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "Falklands_War",
+      "target": "Falkland_Islands",
+      "type": "location",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "Falklands_War",
+      "target": "United_Kingdom",
+      "type": "participant",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "Falklands_War",
+      "target": "Argentina",
+      "type": "participant",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "Port_Stanley",
+      "target": "Falkland_Islands",
+      "type": "capital_of",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    },
+    {
+      "source": "RAF_Mount_Pleasant",
+      "target": "Falkland_Islands",
+      "type": "located_in",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    }
+  ],
+  "summaries": [
+    {
+      "text": "The Falkland Islands, also known as Islas Malvinas, are a British Overseas Territory located in the South Atlantic Ocean. The sovereignty of the islands is disputed by Argentina, leading to the Falklands War in 1982. The capital of the islands is Port Stanley, and they host a significant British military presence at RAF Mount Pleasant.",
+      "provenance": "https://en.wikipedia.org/wiki/History_of_the_Falkland_Islands"
+    }
+  ]
+}
