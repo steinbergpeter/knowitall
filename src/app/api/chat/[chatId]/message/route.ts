@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { MessageInputSchema } from '@/validations/message'
+import { runResearchAgent } from '@/lib/mastra/agents/research-agent'
+import { MessageAuthor } from '@prisma/client'
 
 interface Context {
   params: Promise<{ chatId: string }>
@@ -37,19 +39,30 @@ export async function POST(req: NextRequest, context: Context) {
         content,
       },
     })
-    // Simulate AI response
-    const aiContent = `This is a simulated AI response to: "${content}"`
+    // Fetch last 10 messages for context (including the new user message)
+    const history = await prisma.message.findMany({
+      where: { chatId },
+      orderBy: { createdAt: 'desc' },
+      take: 10, // get the last 10 messages (most recent)
+    })
+    // Reverse to chronological order for the agent
+    const messages = history.reverse().map((msg) => ({
+      role: (msg.author === MessageAuthor.user ? 'user' : 'assistant') as
+        | 'user'
+        | 'assistant',
+      content: msg.content,
+    }))
+    // Generate AI response using Mastra agent
+    const aiResult = await runResearchAgent(messages, { projectId })
+    const aiContent = aiResult.text || 'AI did not return a response.'
     const aiMessage = await prisma.message.create({
       data: {
         chatId,
         projectId,
-        author: 'ai',
+        author: 'assistant',
         content: aiContent,
       },
     })
-
-    // Add a 4 second delay before responding
-    await new Promise((resolve) => setTimeout(resolve, 4000))
 
     return NextResponse.json({ userMessage, aiMessage })
   } catch (err) {

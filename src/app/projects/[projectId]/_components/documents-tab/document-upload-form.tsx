@@ -112,6 +112,7 @@ function DocumentUploadForm({
             ? docContent
             : undefined,
       url: docType === 'web' ? url : undefined,
+      source: 'user', // always set source to 'user' for uploads
     }
     const { success, data, error } = DocumentSchema.safeParse(input)
     if (!success) {

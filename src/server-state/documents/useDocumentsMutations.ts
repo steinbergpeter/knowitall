@@ -12,10 +12,14 @@ const createDocument = async (
   if (!parsed.success) {
     throw new Error(parsed.error.errors[0]?.message || 'Invalid input')
   }
+  const inputWithSource = {
+    ...parsed.data,
+    source: parsed.data.source || 'user',
+  }
   const res = await fetch('/api/document', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(parsed.data),
+    body: JSON.stringify(inputWithSource),
   })
   if (!res.ok) throw new Error('Failed to create document')
   const data = await res.json()

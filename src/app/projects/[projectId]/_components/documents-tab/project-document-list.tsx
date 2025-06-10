@@ -41,6 +41,9 @@ function ProjectDocumentList({ projectId }: { projectId: string }) {
                 <div className="text-xs text-gray-400">
                   Uploaded: {new Date(doc.createdAt).toLocaleString()}
                 </div>
+                <div className="text-xs text-gray-400">
+                  Source: {doc.source}
+                </div>
               </div>
             </li>
           ))}

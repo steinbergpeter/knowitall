@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { verifyPassword } from '@/lib/password'
 
 interface Context {
   params: Promise<{ documentId: string }>
@@ -26,6 +27,7 @@ export async function GET(_req: NextRequest, context: Context) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
+  // The returned document object includes the 'source' field
   return NextResponse.json({ document })
 }
 
@@ -54,9 +56,8 @@ export async function DELETE(req: NextRequest, context: Context) {
   if (!password || !document.project.passwordHash) {
     return NextResponse.json({ error: 'Password required' }, { status: 400 })
   }
-  const valid = await import('@/lib/password').then((m) =>
-    m.verifyPassword(password, document.project.passwordHash!)
-  )
+  const valid = verifyPassword(password, document.project.passwordHash!)
+
   if (!valid) {
     return NextResponse.json({ error: 'Incorrect password' }, { status: 401 })
   }

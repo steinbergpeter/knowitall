@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { useCreateProject } from '@/server-state/mutations_legacy/useCreateProject'
 import { type CreatedProject } from '@/validations/project'
 import { useSession } from 'next-auth/react'
-import { useState } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 
 interface ProjectCreateFormProps {
   onCreated?: (project: CreatedProject) => void
@@ -25,11 +25,11 @@ export function ProjectCreateForm({ onCreated }: ProjectCreateFormProps) {
     setValues(initialValues)
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValues((v) => ({ ...v, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     createProject(values) // Do not send isPublic
   }

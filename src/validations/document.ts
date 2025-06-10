@@ -7,6 +7,7 @@ export const DocumentSchema = z.object({
   url: z.string().url().optional(),
   content: z.string().optional(),
   metadata: z.record(z.any()).optional(),
+  source: z.string().optional().default('user'), // add source field
 })
 
 export type DocumentFormValues = z.infer<typeof DocumentSchema>
@@ -21,6 +22,7 @@ export const CreatedDocumentSchema = z.object({
   content: z.string().optional().nullable().default(null),
   extractedText: z.string().optional().nullable().default(null),
   metadata: z.record(z.any()).optional().nullable().default(null),
+  source: z.string().default('user'), // add source field
   createdAt: z.string(), // ISO date string
   updatedAt: z.string(), // ISO date string
 })

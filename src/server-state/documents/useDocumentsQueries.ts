@@ -21,6 +21,8 @@ const getDocuments = async (
   return CreatedDocumentSchema.array().parse(data.documents)
 }
 
+// All document objects returned from the API are expected to include the 'source' field.
+
 export const getDocument = async (
   documentId: string | undefined,
   baseUrl?: string

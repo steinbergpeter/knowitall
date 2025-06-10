@@ -24,10 +24,10 @@ export default function ChatHistory({
         <div
           key={idx}
           className={`p-4 bg-gray-50 border border-gray-200 rounded-xl ${
-            item.author === 'ai' ? 'mr-2' : 'ml-2'
+            item.author === 'assistant' ? 'mr-2' : 'ml-2'
           }`}
         >
-          {item.author === 'ai' ? (
+          {item.author === 'assistant' ? (
             <div className="text-green-700">
               <span className="font-semibold">AI:</span> {item.content}
             </div>

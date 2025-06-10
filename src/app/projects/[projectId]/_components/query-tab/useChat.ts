@@ -81,7 +81,7 @@ export function useChat(projectId: string) {
         id: 'ai-loading',
         projectId,
         chatId: selectedChatId ?? '',
-        author: 'ai',
+        author: 'assistant',
         content: 'Loading or creating chat...',
         createdAt: '',
         updatedAt: '',
@@ -93,7 +93,7 @@ export function useChat(projectId: string) {
         id: 'ai-loading',
         projectId,
         chatId: selectedChatId,
-        author: 'ai',
+        author: 'assistant',
         content: 'Loading chat history...',
         createdAt: '',
         updatedAt: '',
@@ -106,7 +106,7 @@ export function useChat(projectId: string) {
           id: 'ai-welcome',
           projectId,
           chatId: selectedChatId,
-          author: 'ai',
+          author: 'assistant',
           content:
             '👋 Welcome! This is your project research assistant. Ask any research question about your project, and I’ll answer or help you explore your knowledge graph. Try: "What are the main findings about X?" or "Summarize the key documents."',
           createdAt: '',
@@ -148,7 +148,7 @@ export function useChat(projectId: string) {
     ) {
       // Check if both the user and AI message for the latest input are present
       const lastUser = optimisticMessages.find((m) => m.author === 'user')
-      const lastAI = optimisticMessages.find((m) => m.author === 'ai')
+      const lastAI = optimisticMessages.find((m) => m.author === 'assistant')
       const hasUser =
         lastUser &&
         chatData.messages.some(
@@ -157,7 +157,7 @@ export function useChat(projectId: string) {
       const hasAI =
         lastAI &&
         chatData.messages.some(
-          (m) => m.author === 'ai' && m.content !== 'Thinking...'
+          (m) => m.author === 'assistant' && m.content !== 'Thinking...'
         )
       if (hasUser && hasAI) {
         setOptimisticMessages([])
@@ -195,7 +195,7 @@ export function useChat(projectId: string) {
         id: 'optimistic-ai',
         projectId,
         chatId: selectedChatId,
-        author: 'ai',
+        author: 'assistant',
         content: 'Thinking...',
         createdAt: '',
         updatedAt: '',

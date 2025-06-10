@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const MessageAuthorSchema = z.enum(['user', 'ai'])
+export const MessageAuthorSchema = z.enum(['user', 'assistant'])
 export type MessageAuthor = z.infer<typeof MessageAuthorSchema>
 
 export const MessageSchema = z.object({
