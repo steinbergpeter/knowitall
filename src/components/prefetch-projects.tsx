@@ -2,7 +2,7 @@
 
 import { useEffect, type FC } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { getProjects } from '@/server-state/queries_legacy/useProjects'
+import { getProjects } from '@/server-state/projects/useProjectsQueries'
 
 const PrefetchProjects: FC = () => {
   const queryClient = useQueryClient()

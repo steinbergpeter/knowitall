@@ -8,6 +8,7 @@ import { SessionProvider } from 'next-auth/react'
 type ProviderProps = {
   children: ReactNode
 }
+
 function Providers({ children }: ProviderProps) {
   return (
     <ThemeProvider>

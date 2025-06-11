@@ -1,17 +1,19 @@
+import { cn } from '@/lib/utils'
 import type { Message } from '@/validations/message'
 import type { AnchorHTMLAttributes } from 'react'
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 function MarkdownLink(props: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const { children, className, ...rest } = props
   return (
     <a
-      {...props}
+      {...rest}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-blue-600 underline"
+      className={cn('text-blue-600 underline', className)}
     >
-      {props.children}
+      {children}
     </a>
   )
 }
